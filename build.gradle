@@ -72,6 +72,27 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+// querydsl generated route setting
+def querydslDir = "build/generated/querydsl"
+
+tasks.withType(JavaCompile) {
+	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs(querydslDir)
+		}
+	}
+}
+
+tasks.named("clean") {
+	doLast {
+		file(querydslDir).deleteRecursively()
+	}
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
