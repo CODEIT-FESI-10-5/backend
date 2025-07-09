@@ -25,7 +25,6 @@ public class UserService {
                 .email(email)
                 .password(encodedPassword)
                 .userRole(UserRole.USER)
-                .is_deleted(false)
                 .build();
 
         userRepository.save(user);
@@ -35,4 +34,11 @@ public class UserService {
         userRepository.assertEmailNotExists(email);
     }
 
+    public User findUserById(Long userId) {
+        return userRepository.getByIdOrThrow(userId);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.getByEmailOrThrow(email);
+    }
 }

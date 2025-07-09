@@ -22,6 +22,16 @@ public class DomainUserRepository {
                 });
     }
 
+    public User getByEmailOrThrow(String email) {
+        return jpaUserRepository.findByEmail(email)
+                .orElseThrow(() -> new BaseException(UserErrorCode.NOT_EXIST_USER));
+    }
+
+    public User getByIdOrThrow(Long id) {
+        return jpaUserRepository.findById(id)
+                .orElseThrow(() -> new BaseException(UserErrorCode.NOT_EXIST_USER));
+    }
+
     public void save(User user) {
         jpaUserRepository.save(user);
     }
