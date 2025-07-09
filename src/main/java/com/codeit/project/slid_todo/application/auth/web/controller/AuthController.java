@@ -3,6 +3,8 @@ package com.codeit.project.slid_todo.application.auth.web.controller;
 import com.codeit.project.slid_todo.application.auth.business.AuthFacade;
 import com.codeit.project.slid_todo.application.auth.web.dto.SignupDto;
 import com.codeit.project.slid_todo.common.dto.ResponseDto;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,5 +30,16 @@ public class AuthController {
                 .build();
 
         return ResponseEntity.status(response.getHttpStatusCode()).body(response);
+    }
+
+    @PostMapping("/api/auth/reissue")
+    public ResponseEntity<ResponseDto<Void>> reissue(HttpServletRequest request, HttpServletResponse response) {
+        authFacade.reissue(request,response);
+
+        ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
+                .httpStatusCode(HttpStatus.OK.value())
+                .build();
+
+        return ResponseEntity.status(responseDto.getHttpStatusCode()).body(responseDto);
     }
 }
