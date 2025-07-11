@@ -1,17 +1,19 @@
 package com.codeit.project.slid_todo.application.auth.web.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
 public record SignupDto () {
 
     public record Request(
-            @NotNull(message = "email은 필수값입니다")
+            @NotNull(message = "이름은 필수값입니다")
             String name,
 
-            @NotNull(message = "email은 필수값입니다")
+            @Email
+            @NotNull(message = "이메일은 필수값입니다")
             String email,
 
-            @NotNull(message = "password은 필수값입니다")
+            @NotNull(message = "비밀번호는 필수값입니다")
             String password
     ) { }
 
