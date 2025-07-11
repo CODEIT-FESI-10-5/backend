@@ -3,6 +3,7 @@ package com.codeit.project.slid_todo.common.config;
 import com.codeit.project.slid_todo.common.security.filter.JwtAuthenticationFilter;
 import com.codeit.project.slid_todo.common.security.filter.JwtVerificationFilter;
 import com.codeit.project.slid_todo.common.security.handler.*;
+import com.codeit.project.slid_todo.common.security.jwt.JwtProperties;
 import com.codeit.project.slid_todo.common.security.jwt.JwtProvider;
 import com.codeit.project.slid_todo.domain.user.persistent.entity.enums.UserRole;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,6 +54,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            HttpSession httpSession,
+                                           JwtProperties jwtProperties,
                                            JwtProvider jwtProvider,
                                            AuthenticationManager authenticationManager,
                                            CustomAuthenticationSuccessHandler successHandler) throws Exception {
@@ -71,7 +73,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
 
         http
-                .addFilterBefore(new JwtVerificationFilter(jwtProvider), JwtAuthenticationFilter.class)
+                .addFilterBefore(new JwtVerificationFilter(jwtProvider, jwtProperties), JwtAuthenticationFilter.class)
                 .addFilterAt(jwtAuthenticationFilter(authenticationManager, successHandler), UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout.logoutSuccessHandler(logoutSuccessHandler).logoutUrl("/api/logout"))
                 .exceptionHandling(ex -> ex

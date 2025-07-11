@@ -6,7 +6,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -17,9 +16,11 @@ import java.util.Date;
 public class JwtProvider {
 
     private Key key;
+    private JwtProperties jwtProperties;
 
-    public JwtProvider(@Value("${spring.jwt.secret}") String secret) {
-        byte[] byteSecretKey = Decoders.BASE64.decode(secret);
+    public JwtProvider(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+        byte[] byteSecretKey = Decoders.BASE64.decode(jwtProperties.getSecretKey());
         key = Keys.hmacShaKeyFor(byteSecretKey);
     }
 
@@ -29,8 +30,8 @@ public class JwtProvider {
         return Jwts.builder()
                 .setSubject(subject)
                 .claim("id", id)
-                .claim(JwtProperties.AUTHORITIES_KEY, userRole.getRole())
-                .setExpiration(new Date(now + JwtProperties.ACCESS_EXPIRATION_TIME))
+                .claim(jwtProperties.getAuthoritiesKey(), userRole.getRole())
+                .setExpiration(new Date(now + jwtProperties.getAccessExpirationTime()))
                 .signWith(key)
                 .compact();
     }
@@ -40,7 +41,7 @@ public class JwtProvider {
 
         return Jwts.builder()
                 .setSubject(subject)
-                .setExpiration(new Date(now + JwtProperties.REFRESH_EXPIRATION_TIME))
+                .setExpiration(new Date(now + jwtProperties.getRefreshExpirationTime()))
                 .signWith(key)
                 .compact();
     }

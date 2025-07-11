@@ -26,6 +26,7 @@ import java.io.IOException;
 public class JwtVerificationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final JwtProperties jwtProperties;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -48,7 +49,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
 
     private boolean validAuthorizationHeader(HttpServletRequest request) {
         String authorizationHeader = getAuthenticationTokenToHeader(request);
-        return authorizationHeader != null && authorizationHeader.startsWith(JwtProperties.TOKEN_PREFIX);
+        return authorizationHeader != null && authorizationHeader.startsWith(jwtProperties.getTokenPrefix());
     }
 
     private void setAuthenticationToContext(HttpServletRequest request) {
@@ -61,7 +62,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
     }
 
     private CustomUserDetails createUserDetails(HttpServletRequest request) {
-        String token = getAuthenticationTokenToHeader(request).substring(JwtProperties.TOKEN_PREFIX.length());
+        String token = getAuthenticationTokenToHeader(request).substring(jwtProperties.getTokenPrefix().length());
         return new CustomUserDetails(jwtProvider.getClaims(token));
     }
 

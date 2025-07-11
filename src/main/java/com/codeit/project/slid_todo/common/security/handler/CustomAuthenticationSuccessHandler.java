@@ -33,6 +33,7 @@ import java.util.Date;
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ResponseUtil responseUtil;
+    private final JwtProperties jwtProperties;
     private final JwtProvider jwtProvider;
     private final CookieUtils cookieUtils;
 
@@ -77,7 +78,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         response.setCharacterEncoding("utf-8");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_OK);
-        response.addHeader(HttpHeaders.AUTHORIZATION, JwtProperties.TOKEN_PREFIX + accessToken);
+        response.addHeader(HttpHeaders.AUTHORIZATION, jwtProperties.getTokenPrefix() + accessToken);
 
         Cookie refreshTokenCookie = cookieUtils.createCookie("refreshToken", refreshToken);
         response.addCookie(refreshTokenCookie);

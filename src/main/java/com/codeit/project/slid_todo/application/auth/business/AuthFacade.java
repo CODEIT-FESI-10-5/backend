@@ -29,6 +29,7 @@ public class AuthFacade {
 
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final JwtProperties jwtProperties;
     private final JwtProvider jwtProvider;
     private final CookieUtils cookieUtils;
 
@@ -63,7 +64,7 @@ public class AuthFacade {
             response.setCharacterEncoding("utf-8");
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_OK);
-            response.addHeader(HttpHeaders.AUTHORIZATION, JwtProperties.TOKEN_PREFIX + newAccess);
+            response.addHeader(HttpHeaders.AUTHORIZATION, jwtProperties.getTokenPrefix() + newAccess);
             response.addCookie(cookieUtils.createCookie("refreshToken", newRefresh));
         } catch (ExpiredJwtException ee) {
             request.setAttribute("errorCode", AuthErrorCode.ACCESS_TOKEN_EXPIRED);

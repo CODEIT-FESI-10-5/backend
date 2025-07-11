@@ -1,8 +1,21 @@
 package com.codeit.project.slid_todo.common.security.jwt;
 
+import com.codeit.project.slid_todo.common.config.property.YamlPropertySourceFactory;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
+
+@Getter
+@Setter
+@Component
+@ConfigurationProperties("spring.jwt")
+@PropertySource(value = "classpath:application-local.yml", factory = YamlPropertySourceFactory.class)
 public class JwtProperties {
-    public static final int ACCESS_EXPIRATION_TIME = 1000 * 60 * 30; // 30 minutes
-    public static final int REFRESH_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 1 week
-    public static final String AUTHORITIES_KEY = "auth";
-    public static final String TOKEN_PREFIX = "Bearer ";
+    public int accessExpirationTime;
+    public int refreshExpirationTime;
+    public String authoritiesKey;
+    public String tokenPrefix;
+    public String secretKey;
 }
