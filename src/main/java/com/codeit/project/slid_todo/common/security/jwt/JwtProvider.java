@@ -1,6 +1,5 @@
 package com.codeit.project.slid_todo.common.security.jwt;
 
-import com.codeit.project.slid_todo.domain.user.persistent.entity.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -24,13 +23,12 @@ public class JwtProvider {
         key = Keys.hmacShaKeyFor(byteSecretKey);
     }
 
-    public String generateAccessToken(String subject, Long id, UserRole userRole) {
+    public String generateAccessToken(String subject, Long id) {
         long now = new Date().getTime();
 
         return Jwts.builder()
                 .setSubject(subject)
                 .claim("id", id)
-                .claim(jwtProperties.getAuthoritiesKey(), userRole.getRole())
                 .setExpiration(new Date(now + jwtProperties.getAccessExpirationTime()))
                 .signWith(key)
                 .compact();

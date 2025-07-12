@@ -83,8 +83,7 @@ public class AuthFacade {
     private String getAccessToken(User user) {
         return jwtProvider.generateAccessToken(
                 user.getEmail(),
-                user.getId(),
-                user.getUserRole()
+                user.getId()
         );
     }
 

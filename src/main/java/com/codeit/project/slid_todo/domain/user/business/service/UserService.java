@@ -1,7 +1,6 @@
 package com.codeit.project.slid_todo.domain.user.business.service;
 
 import com.codeit.project.slid_todo.domain.user.persistent.entity.User;
-import com.codeit.project.slid_todo.domain.user.persistent.entity.enums.UserRole;
 import com.codeit.project.slid_todo.domain.user.persistent.repository.DomainUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ public class UserService {
                 .name(name)
                 .email(email)
                 .password(encodedPassword)
-                .userRole(UserRole.USER)
                 .build();
 
         userRepository.save(user);

@@ -5,7 +5,6 @@ import com.codeit.project.slid_todo.common.security.filter.JwtVerificationFilter
 import com.codeit.project.slid_todo.common.security.handler.*;
 import com.codeit.project.slid_todo.common.security.jwt.JwtProperties;
 import com.codeit.project.slid_todo.common.security.jwt.JwtProvider;
-import com.codeit.project.slid_todo.domain.user.persistent.entity.enums.UserRole;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -37,10 +36,6 @@ public class SecurityConfig {
             "/api/login",
     };
 
-    private static final String[] ADMIN_ENDPOINTS = {
-            "/api/admin"
-    };
-
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -69,7 +64,6 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers(ADMIN_ENDPOINTS).hasAuthority(UserRole.ADMIN.getRole())
                         .anyRequest().authenticated());
 
         http
