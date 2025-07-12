@@ -34,8 +34,22 @@ public class StudyUser extends BaseDateTime {
 
     @Builder
     public StudyUser(Study study, User user, UserRole userRole) {
-        this.study = study;
-        this.user = user;
+        addStudy(study);
+        addUser(user);
         this.userRole = userRole;
+    }
+
+    private void addStudy(Study study) {
+        if (study != null) {
+            this.study = study;
+            study.getStudyUsers().add(this);
+        }
+    }
+
+    private void addUser(User user) {
+        if (user != null) {
+            this.user = user;
+            user.getStudyUsers().add(this);
+        }
     }
 }
