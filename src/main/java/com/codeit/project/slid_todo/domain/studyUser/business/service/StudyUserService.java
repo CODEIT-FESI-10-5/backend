@@ -25,4 +25,8 @@ public class StudyUserService {
 
         studyUserRepository.save(studyUser);
     }
+
+    public StudyUser findByStudyIdAndUserId(Long studyId, Long userId) {
+        return studyUserRepository.getOrThrowIfNotJoined(studyId, userId);
+    }
 }
