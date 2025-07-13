@@ -27,7 +27,6 @@ public class RefreshToken extends BaseDateTime {
     @Builder
     public RefreshToken(User user, String token, Date expiryAt) {
         addUser(user);
-        this.user = user;
         this.token = token;
         this.expiryAt = expiryAt;
     }

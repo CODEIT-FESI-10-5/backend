@@ -58,7 +58,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
 
     private Authentication createAuthenticatedToken(HttpServletRequest request) {
         CustomUserDetails userDetails = createUserDetails(request);
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails.getUserIdx(), null, userDetails.getAuthorities());
     }
 
     private CustomUserDetails createUserDetails(HttpServletRequest request) {

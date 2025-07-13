@@ -2,7 +2,7 @@ package com.codeit.project.slid_todo.domain.user.persistent.entity;
 
 import com.codeit.project.slid_todo.common.audting.BaseDateTime;
 import com.codeit.project.slid_todo.domain.refreshToken.persistent.entity.RefreshToken;
-import com.codeit.project.slid_todo.domain.user.persistent.entity.enums.UserRole;
+import com.codeit.project.slid_todo.domain.studyUser.persistent.entity.StudyUser;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,9 +18,6 @@ public class User extends BaseDateTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "user")
-    private List<RefreshToken> refreshTokens = new ArrayList<>();
-
     @Column(unique = true)
     private String email;
 
@@ -28,17 +25,19 @@ public class User extends BaseDateTime {
 
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    private UserRole userRole;
-
     private boolean is_deleted = Boolean.FALSE;
 
+    @OneToMany(mappedBy = "user")
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<StudyUser> studyUsers = new ArrayList<>();
+
     @Builder
-    public User(List<RefreshToken> refreshTokens, String email, String password, String name, UserRole userRole) {
+    public User(List<RefreshToken> refreshTokens, String email, String password, String name) {
         this.refreshTokens = refreshTokens;
         this.email = email;
         this.password = password;
         this.name = name;
-        this.userRole = userRole;
     }
 }
