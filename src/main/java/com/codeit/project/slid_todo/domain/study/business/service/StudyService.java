@@ -1,5 +1,7 @@
 package com.codeit.project.slid_todo.domain.study.business.service;
 
+import com.codeit.project.slid_todo.common.util.ImgStore;
+import com.codeit.project.slid_todo.common.vo.UploadImg;
 import com.codeit.project.slid_todo.domain.study.persistent.entity.Study;
 import com.codeit.project.slid_todo.domain.study.persistent.repository.DomainStudyRepository;
 import com.codeit.project.slid_todo.domain.user.persistent.entity.User;
@@ -13,10 +15,21 @@ import org.springframework.stereotype.Service;
 public class StudyService {
 
     private final DomainStudyRepository studyRepository;
+    private final ImgStore imgStore;
 
     public Study createStudy(User user) {
         Study study = Study.builder().build();
         studyRepository.save(study);
         return study;
+    }
+
+    public void updateStudy(Long studyId, String title, String description, UploadImg uploadImg) {
+        Study study = studyRepository.getByIdOrThrow(studyId);
+
+        if (uploadImg != null && study.getImage() != null) {
+            imgStore.deleteImage(study.getImage().getStoreImgName());
+        }
+
+        study.updateStudy(title, description, uploadImg);
     }
 }
