@@ -1,6 +1,7 @@
 package com.codeit.project.slid_todo.domain.study.persistent.entity;
 
 import com.codeit.project.slid_todo.common.audting.BaseDateTime;
+import com.codeit.project.slid_todo.domain.goal.persistent.entity.Goal;
 import com.codeit.project.slid_todo.domain.studyUser.persistent.entity.StudyUser;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -32,6 +33,9 @@ public class Study extends BaseDateTime {
 
     @OneToMany(mappedBy = "study")
     private List<StudyUser> studyUsers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "study")
+    private List<Goal> goals = new ArrayList<>();
 
     @Builder
     public Study(String title, String description, String image, String inviteCode) {
