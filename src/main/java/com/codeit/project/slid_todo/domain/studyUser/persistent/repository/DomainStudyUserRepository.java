@@ -21,4 +21,8 @@ public class DomainStudyUserRepository {
         return jpaStudyUserRepository.findByStudyIdAndUserId(studyId, userId)
                 .orElseThrow(() -> new BaseException(StudyUserErrorCode.STUDY_USER_NOT_FOUND));
     }
+
+    public StudyUser findByStudyIdAndUserId(Long studyId, Long userId) {
+        return jpaStudyUserRepository.findByStudyIdAndUserId(studyId, userId).orElse(null);
+    }
 }
