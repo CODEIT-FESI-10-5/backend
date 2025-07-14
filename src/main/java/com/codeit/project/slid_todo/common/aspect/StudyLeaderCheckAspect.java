@@ -28,7 +28,7 @@ public class StudyLeaderCheckAspect {
         Long studyId = extractParam(joinPoint, studyIdParamName);
         Long userId  = extractParam(joinPoint, userIdParamName);
 
-        StudyUser studyUser = studyUserService.findByStudyIdAndUserId(studyId, userId);
+        StudyUser studyUser = studyUserService.getOrThrowIfNotJoined(studyId, userId);
 
         if(studyUser.getUserRole() != UserRole.LEADER) {
             throw new BaseException(StudyUserErrorCode.NOT_STUDY_LEADER);
