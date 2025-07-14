@@ -1,7 +1,9 @@
 package com.codeit.project.slid_todo.domain.study.business.service;
 
+import com.codeit.project.slid_todo.common.exception.BaseException;
 import com.codeit.project.slid_todo.common.util.ImgStore;
 import com.codeit.project.slid_todo.common.vo.UploadImg;
+import com.codeit.project.slid_todo.domain.study.errorCode.StudyErrorCode;
 import com.codeit.project.slid_todo.domain.study.persistent.entity.Study;
 import com.codeit.project.slid_todo.domain.study.persistent.repository.DomainStudyRepository;
 import com.codeit.project.slid_todo.domain.user.persistent.entity.User;
@@ -31,5 +33,13 @@ public class StudyService {
         }
 
         study.updateStudy(title, description, uploadImg);
+    }
+
+    public Study getStudyIfInviteCodeMatches(Long studyId, String inputCode) {
+        Study study = studyRepository.getByIdOrThrow(studyId);
+        if (!study.getInviteCode().equals(inputCode)) {
+            throw new BaseException(StudyErrorCode.INVALID_INVITE_CODE);
+        }
+        return study;
     }
 }

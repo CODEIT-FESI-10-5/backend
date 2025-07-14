@@ -1,6 +1,7 @@
 package com.codeit.project.slid_todo.application.studyManage.business.service;
 
 import com.codeit.project.slid_todo.application.studyManage.web.dto.EditStudyDto;
+import com.codeit.project.slid_todo.application.studyManage.web.dto.JoinStudyDto;
 import com.codeit.project.slid_todo.common.util.ImgStore;
 import com.codeit.project.slid_todo.common.vo.UploadImg;
 import com.codeit.project.slid_todo.domain.study.business.service.StudyService;
@@ -29,7 +30,7 @@ public class StudyManageFacade {
     public void createStudy(Long userId) {
         User user = userService.findUserById(userId);
         Study study = studyService.createStudy(user);
-        studyUserService.save(user, study);
+        studyUserService.saveLeader(user, study);
     }
 
     public void updateStudy(EditStudyDto.Request editStudyDto, Long studyId) throws IOException {
@@ -40,5 +41,13 @@ public class StudyManageFacade {
         UploadImg uploadImg = imgStore.storeImg(image);
 
         studyService.updateStudy(studyId, title, description, uploadImg);
+    }
+
+    public void joinStudy(JoinStudyDto.Request joinStudyDto, Long studyId, Long userId) {
+        Study study = studyService.getStudyIfInviteCodeMatches(studyId, joinStudyDto.inviteCode());
+        studyUserService.validateNotJoined(studyId, userId);
+
+        User user = userService.findUserById(userId);
+        studyUserService.saveTeamMember(user, study);
     }
 }
