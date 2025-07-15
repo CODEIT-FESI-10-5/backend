@@ -18,8 +18,11 @@ public class DomainStudyRepository {
                 .orElseThrow(() -> new BaseException(StudyErrorCode.NOT_EXIST_STUDY));
     }
 
-    public void save(Study study) {
-        jpaStudyRepository.save(study);
+    public Study save(Study study) {
+        return jpaStudyRepository.save(study);
     }
 
+    public boolean existsByInviteCode(String code) {
+        return jpaStudyRepository.existsByInviteCode(code);
+    }
 }
