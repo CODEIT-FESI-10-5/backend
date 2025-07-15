@@ -34,6 +34,14 @@ public class DomainTodoRepository {
         return jpaTodoRepository.countByGoalIdAndUserId(goalId, userId);
     }
 
+    public long countCompletedByStudyId(Long studyId) {
+        return jpaTodoRepository.countCompletedByStudyId(studyId);
+    }
+
+    public long countByStudy(Long studyId) {
+        return jpaTodoRepository.countByStudy(studyId);
+    }
+
     public long countByGoalId(Long goalId) {
         return jpaTodoRepository.countByGoalIdAndNotDeleted(goalId);
     }
