@@ -8,6 +8,9 @@ import com.codeit.project.slid_todo.application.studyManage.web.dto.StudyListDto
 import com.codeit.project.slid_todo.common.annotation.CheckStudyLeader;
 import com.codeit.project.slid_todo.common.annotation.CurrentUser;
 import com.codeit.project.slid_todo.common.dto.ResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
+@Tag(name = "Study Management", description = "스터디 관리 API")
 @RestController
 @RequiredArgsConstructor
 public class StudyManageController {
@@ -22,7 +26,9 @@ public class StudyManageController {
     private final StudyManageFacade studyManageFacade;
 
     @PostMapping("/api/study")
-    public ResponseEntity<ResponseDto<Void>> createStudy(@CurrentUser Long userId) {
+    @Operation(summary = "스터디 생성", description = "새로운 스터디를 생성합니다.")
+    public ResponseEntity<ResponseDto<Void>> createStudy(
+            @Parameter(hidden = true) @CurrentUser Long userId) {
 
         studyManageFacade.createStudy(userId);
 
@@ -35,10 +41,11 @@ public class StudyManageController {
 
     @CheckStudyLeader
     @PatchMapping("/api/study/{studyId}")
+    @Operation(summary = "스터디 수정", description = "스터디 제목, 설명, 이미지를 수정합니다.")
     public ResponseEntity<ResponseDto<Void>> editStudy(
             @ModelAttribute EditStudyDto.Request editStudyDto,
-            @PathVariable Long studyId,
-            @CurrentUser Long userId) throws IOException {
+            @Parameter(description = "스터디 ID") @PathVariable Long studyId,
+            @Parameter(hidden = true) @CurrentUser Long userId) throws IOException {
 
         studyManageFacade.updateStudy(editStudyDto, studyId);
 
@@ -50,10 +57,11 @@ public class StudyManageController {
     }
 
     @PostMapping("/api/study/{studyId}/join")
+    @Operation(summary = "스터디 참가", description = "초대 코드를 이용하여 스터디에 참여합니다.")
     public ResponseEntity<ResponseDto<Void>> joinStudy(
-            @PathVariable Long studyId,
+            @Parameter(description = "스터디 ID") @PathVariable Long studyId,
             @RequestBody JoinStudyDto.Request joinStudyDto,
-            @CurrentUser Long userId
+            @Parameter(hidden = true) @CurrentUser Long userId
     ) {
 
         studyManageFacade.joinStudy(joinStudyDto, studyId, userId);
@@ -66,7 +74,9 @@ public class StudyManageController {
     }
 
     @GetMapping("/api/study")
-    public ResponseEntity<ResponseDto<StudyListDto.Response>> getStudyList(@CurrentUser Long userId) {
+    @Operation(summary = "스터디 목록 조회", description = "참여 중인 모든 스터디 목록을 조회합니다.")
+    public ResponseEntity<ResponseDto<StudyListDto.Response>> getStudyList(
+            @Parameter(hidden = true) @CurrentUser Long userId) {
         StudyListDto.Response responseData = studyManageFacade.getStudyList(userId);
 
         ResponseDto<StudyListDto.Response> response = ResponseDto.<StudyListDto.Response>builder()
@@ -78,9 +88,10 @@ public class StudyManageController {
     }
 
     @GetMapping("/api/study/{studyId}")
+    @Operation(summary = "스터디 상세 조회", description = "스터디 상세 정보 및 참여 멤버, 진행률 등을 조회합니다.")
     public ResponseEntity<ResponseDto<StudyDetailsDto.Response>> getStudyDetail(
-            @PathVariable Long studyId,
-            @CurrentUser Long userId
+            @Parameter(description = "스터디 ID") @PathVariable Long studyId,
+            @Parameter(hidden = true) @CurrentUser Long userId
     ) {
 
         StudyDetailsDto.Response responseData = studyManageFacade.getStudyDetail(studyId, userId);
@@ -91,17 +102,6 @@ public class StudyManageController {
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @CheckStudyLeader
-    @PostMapping("/api/study/{studyId}")
-    public ResponseEntity<ResponseDto<Void>> createStudyGoal(@PathVariable Long studyId, @CurrentUser Long userId) {
-
-        ResponseDto<Void> response = ResponseDto.<Void>builder()
-                .httpStatusCode(HttpStatus.CREATED.value())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 }
