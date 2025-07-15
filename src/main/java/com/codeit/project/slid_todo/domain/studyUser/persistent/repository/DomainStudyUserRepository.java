@@ -40,4 +40,8 @@ public class DomainStudyUserRepository {
     public List<StudyUser> findAllWithStudyByUserId(Long userId) {
         return jpaStudyUserRepository.findByUserIdAndIsDeletedFalse(userId);
     }
+
+    public List<StudyUser> findAllWithUserByStudyId(Long studyId) {
+        return jpaStudyUserRepository.findByStudyIdAndIsDeletedFalse(studyId);
+    }
 }

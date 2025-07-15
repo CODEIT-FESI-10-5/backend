@@ -11,10 +11,13 @@ import java.util.Optional;
 
 public interface JpaStudyUserRepository extends JpaRepository<StudyUser, Long> {
     Optional<StudyUser> findByStudyIdAndUserId(Long studyId, Long userId);
-    
+
     @Query("SELECT su FROM StudyUser su WHERE su.study.id = :studyId AND su.isDeleted = false")
     List<StudyUser> findByStudyId(@Param("studyId") Long studyId);
 
     @EntityGraph(attributePaths = {"study"})
     List<StudyUser> findByUserIdAndIsDeletedFalse(Long userId);
+
+    @EntityGraph(attributePaths = {"user"})
+    List<StudyUser> findByStudyIdAndIsDeletedFalse(Long studyId);
 }
