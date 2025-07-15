@@ -62,6 +62,7 @@ public class Todo extends BaseDateTime {
     private void addAssignedUser(StudyUser assignedUser) {
         if (assignedUser != null) {
             this.assignedUser = assignedUser;
+            assignedUser.getTodoList().add(this);
         }
     }
 

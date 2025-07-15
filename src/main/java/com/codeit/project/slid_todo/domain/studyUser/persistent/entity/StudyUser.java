@@ -3,12 +3,16 @@ package com.codeit.project.slid_todo.domain.studyUser.persistent.entity;
 import com.codeit.project.slid_todo.common.audting.BaseDateTime;
 import com.codeit.project.slid_todo.domain.study.persistent.entity.Study;
 import com.codeit.project.slid_todo.domain.studyUser.persistent.entity.enums.UserRole;
+import com.codeit.project.slid_todo.domain.todo.persistent.entity.Todo;
 import com.codeit.project.slid_todo.domain.user.persistent.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -26,6 +30,9 @@ public class StudyUser extends BaseDateTime {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "assignedUser")
+    private List<Todo> todoList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
