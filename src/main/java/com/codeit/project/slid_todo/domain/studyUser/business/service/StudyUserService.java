@@ -48,6 +48,10 @@ public class StudyUserService {
         return studyUserRepository.findAllWithStudyByUserId(userId);
     }
 
+    public List<StudyUser> findAllWithUserByStudyId(Long studyId) {
+        return studyUserRepository.findAllWithUserByStudyId(studyId);
+    }
+
     @Transactional
     public void saveLeader(User user, Study study) {
         StudyUser studyUser = StudyUser.builder()
@@ -69,4 +73,5 @@ public class StudyUserService {
 
         studyUserRepository.save(studyUser);
     }
+
 }

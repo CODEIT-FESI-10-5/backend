@@ -42,4 +42,8 @@ public class StudyService {
         }
         return study;
     }
+
+    public Study findByStudyId(Long studyId) {
+        return studyRepository.getByIdOrThrow(studyId);
+    }
 }
