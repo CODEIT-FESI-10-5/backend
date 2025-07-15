@@ -15,7 +15,13 @@ public interface JpaStudyUserRepository extends JpaRepository<StudyUser, Long> {
     @Query("SELECT su FROM StudyUser su WHERE su.study.id = :studyId AND su.isDeleted = false")
     List<StudyUser> findByStudyId(@Param("studyId") Long studyId);
 
-    @EntityGraph(attributePaths = {"study"})
+    @Query("""
+                SELECT su FROM StudyUser su
+                JOIN FETCH su.study s
+                WHERE su.user.id = :userId
+                  AND su.isDeleted = false
+                ORDER BY s.updatedAt DESC
+            """)
     List<StudyUser> findByUserIdAndIsDeletedFalse(Long userId);
 
     @EntityGraph(attributePaths = {"user"})

@@ -14,6 +14,7 @@ public record StudyListDto() {
 
     public record Response(
             int totalCount,
+            Long recentStudyId,
             List<StudyInfo> studyList
     ) {
 
@@ -36,7 +37,11 @@ public record StudyListDto() {
                     )
                     .toList();
 
-            return new Response(studyInfoList.size(), studyInfoList);
+            Long recentStudyId = studyUserList.isEmpty()
+                    ? null
+                    : studyUserList.get(0).getStudy().getId();
+
+            return new Response(studyInfoList.size(), recentStudyId, studyInfoList);
         }
     }
 }
