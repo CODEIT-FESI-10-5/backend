@@ -3,6 +3,8 @@ package com.codeit.project.slid_todo.application.auth.web.controller;
 import com.codeit.project.slid_todo.application.auth.business.AuthFacade;
 import com.codeit.project.slid_todo.application.auth.web.dto.SignupDto;
 import com.codeit.project.slid_todo.common.dto.ResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Authentication", description = "회원가입 및 토큰 재발급 API")
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
@@ -20,6 +23,7 @@ public class AuthController {
     private final AuthFacade authFacade;
 
     @PostMapping("/api/user/signup")
+    @Operation(summary = "회원가입", description = "사용자 정보를 받아 회원가입을 수행합니다.")
     public ResponseEntity<ResponseDto<Void>> singup(
             @Valid @RequestBody SignupDto.Request requestDto) {
 
@@ -33,6 +37,7 @@ public class AuthController {
     }
 
     @PostMapping("/api/auth/reissue")
+    @Operation(summary = "토큰 재발급", description = "Access Token이 만료되었을 때 Refresh Token으로 재발급합니다.")
     public ResponseEntity<ResponseDto<Void>> reissue(HttpServletRequest request, HttpServletResponse response) {
         authFacade.reissue(request,response);
 

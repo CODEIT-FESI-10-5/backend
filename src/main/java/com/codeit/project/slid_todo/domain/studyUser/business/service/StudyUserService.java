@@ -1,6 +1,8 @@
 package com.codeit.project.slid_todo.domain.studyUser.business.service;
 
+import com.codeit.project.slid_todo.common.exception.BaseException;
 import com.codeit.project.slid_todo.domain.study.persistent.entity.Study;
+import com.codeit.project.slid_todo.domain.studyUser.errorCode.StudyUserErrorCode;
 import com.codeit.project.slid_todo.domain.studyUser.persistent.entity.StudyUser;
 import com.codeit.project.slid_todo.domain.studyUser.persistent.entity.enums.UserRole;
 import com.codeit.project.slid_todo.domain.studyUser.persistent.repository.DomainStudyUserRepository;
@@ -18,6 +20,7 @@ public class StudyUserService {
 
     private final DomainStudyUserRepository studyUserRepository;
 
+
     public List<StudyUser> findByStudyId(Long studyId) {
         return studyUserRepository.findByStudyId(studyId);
     }
@@ -26,12 +29,31 @@ public class StudyUserService {
         return studyUserRepository.getByIdOrThrow(studyUserId);
     }
 
-    public StudyUser findByStudyIdAndUserId(Long studyId, Long userId) {
+    public StudyUser getOrThrowIfNotJoined(Long studyId, Long userId) {
         return studyUserRepository.getOrThrowIfNotJoined(studyId, userId);
     }
 
+    public StudyUser findByStudyIdAndUserId(Long studyId, Long userId) {
+        return studyUserRepository.findByStudyIdAndUserId(studyId, userId);
+    }
+
+    public void validateNotJoined(Long studyId, Long userId) {
+        StudyUser studyUser = findByStudyIdAndUserId(studyId, userId);
+        if (studyUser != null) {
+            throw new BaseException(StudyUserErrorCode.ALREADY_JOINED);
+        }
+    }
+
+    public List<StudyUser> findAllWithStudyByUserId(Long userId) {
+        return studyUserRepository.findAllWithStudyByUserId(userId);
+    }
+
+    public List<StudyUser> findAllWithUserByStudyId(Long studyId) {
+        return studyUserRepository.findAllWithUserByStudyId(studyId);
+    }
+
     @Transactional
-    public void save(User user, Study study) {
+    public void saveLeader(User user, Study study) {
         StudyUser studyUser = StudyUser.builder()
                 .study(study)
                 .user(user)
@@ -40,4 +62,16 @@ public class StudyUserService {
 
         studyUserRepository.save(studyUser);
     }
+
+    @Transactional
+    public void saveTeamMember(User user, Study study) {
+        StudyUser studyUser = StudyUser.builder()
+                .study(study)
+                .user(user)
+                .userRole(UserRole.NORMARL)
+                .build();
+
+        studyUserRepository.save(studyUser);
+    }
+
 }

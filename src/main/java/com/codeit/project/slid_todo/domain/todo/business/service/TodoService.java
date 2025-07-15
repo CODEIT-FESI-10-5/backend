@@ -94,4 +94,12 @@ public class TodoService {
     public long countByGoalIdAndUserId(Long goalId, Long userId) {
         return todoRepository.countByGoalIdAndUserId(goalId, userId);
     }
+
+    public long countCompletedByStudyId(Long studyId) {
+        return todoRepository.countCompletedByStudyId(studyId);
+    }
+
+    public long countByStudy(Long studyId) {
+        return todoRepository.countByStudy(studyId);
+    }
 } 

@@ -16,14 +16,14 @@ public class DomainUserRepository {
     private final JpaUserRepository jpaUserRepository;
 
     public void assertEmailNotExists(String email) {
-        jpaUserRepository.findByEmail(email)
+        jpaUserRepository.findByEmailAndIsDeletedFalse(email)
                 .ifPresent(user -> {
                     throw new BaseException(UserErrorCode.EMAIL_ALREADY_EXISTS);
                 });
     }
 
     public User getByEmailOrThrow(String email) {
-        return jpaUserRepository.findByEmail(email)
+        return jpaUserRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new BaseException(UserErrorCode.NOT_EXIST_USER));
     }
 

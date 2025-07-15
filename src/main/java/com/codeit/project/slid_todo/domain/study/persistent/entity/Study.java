@@ -1,6 +1,7 @@
 package com.codeit.project.slid_todo.domain.study.persistent.entity;
 
 import com.codeit.project.slid_todo.common.audting.BaseDateTime;
+import com.codeit.project.slid_todo.common.vo.UploadImg;
 import com.codeit.project.slid_todo.domain.goal.persistent.entity.Goal;
 import com.codeit.project.slid_todo.domain.studyUser.persistent.entity.StudyUser;
 import jakarta.persistence.*;
@@ -25,7 +26,8 @@ public class Study extends BaseDateTime {
 
     private String description;
 
-    private String image;
+    @Embedded
+    private UploadImg image;
 
     private String inviteCode;
 
@@ -38,11 +40,22 @@ public class Study extends BaseDateTime {
     private List<Goal> goals = new ArrayList<>();
 
     @Builder
-    public Study(String title, String description, String image, String inviteCode) {
+    public Study(String title, String description, UploadImg image, String inviteCode) {
         this.title = title;
         this.description = description;
         this.image = image;
         this.inviteCode = inviteCode;
     }
 
+    public void updateStudy(String title, String description, UploadImg uploadImg) {
+        if(title != null) {
+            this.title = title;
+        }
+        if(description != null) {
+            this.description = description;
+        }
+        if(uploadImg != null) {
+            this.image = uploadImg;
+        }
+    }
 }

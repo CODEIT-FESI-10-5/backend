@@ -25,7 +25,7 @@ public class User extends BaseDateTime {
 
     private String name;
 
-    private boolean is_deleted = Boolean.FALSE;
+    private boolean isDeleted = Boolean.FALSE;
 
     @OneToMany(mappedBy = "user")
     private List<RefreshToken> refreshTokens = new ArrayList<>();
