@@ -102,7 +102,7 @@ public class GoalManageFacade {
     @Transactional
     public GoalResponseDto updateGoalPriority(Long goalId, Long userId, GoalPriorityUpdateRequestDto requestDto) {
         Goal goal = goalService.getGoalById(goalId);
-        StudyUser currentUser = studyUserService.findByStudyIdAndUserId(goal.getStudy().getId(), userId);
+        StudyUser currentUser = studyUserService.getOrThrowIfNotJoined(goal.getStudy().getId(), userId);
         
         // 우선순위 변경은 스터디장만 가능
         if (currentUser.getUserRole() != UserRole.LEADER) {

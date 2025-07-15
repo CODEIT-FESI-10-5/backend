@@ -99,7 +99,7 @@ public class TodoManageFacade {
     @Transactional
     public void createTodo(Long goalId, Long userId, CreateTodoRequestDto requestDto) {
         Goal goal = goalService.getGoalById(goalId);
-        StudyUser currentUser = studyUserService.findByStudyIdAndUserId(goal.getStudy().getId(), userId);
+        StudyUser currentUser = studyUserService.getOrThrowIfNotJoined(goal.getStudy().getId(), userId);
         
         if (requestDto.isShared()) {
             // 공통 투두는 스터디장만 생성 가능
@@ -116,7 +116,7 @@ public class TodoManageFacade {
     @Transactional
     public void updateTodo(Long goalId, Long todoId, Long userId, UpdateTodoRequestDto requestDto) {
         Goal goal = goalService.getGoalById(goalId);
-        StudyUser currentUser = studyUserService.findByStudyIdAndUserId(goal.getStudy().getId(), userId);
+        StudyUser currentUser = studyUserService.getOrThrowIfNotJoined(goal.getStudy().getId(), userId);
         
         // 투두가 현재 사용자의 것인지 확인
         Todo todo = todoService.getTodoById(todoId);
@@ -130,7 +130,7 @@ public class TodoManageFacade {
     @Transactional
     public void updateOrder(Long goalId, Long userId, UpdateOrderRequestDto requestDto) {
         Goal goal = goalService.getGoalById(goalId);
-        StudyUser currentUser = studyUserService.findByStudyIdAndUserId(goal.getStudy().getId(), userId);
+        StudyUser currentUser = studyUserService.getOrThrowIfNotJoined(goal.getStudy().getId(), userId);
         
         // 순서 변경은 스터디장만 가능
         if (currentUser.getUserRole() != UserRole.LEADER) {
