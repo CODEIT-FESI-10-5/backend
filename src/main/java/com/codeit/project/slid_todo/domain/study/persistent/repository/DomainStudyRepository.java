@@ -13,6 +13,11 @@ public class DomainStudyRepository {
 
     private final JpaStudyRepository jpaStudyRepository;
 
+    public Study getByIdOrThrow(Long studyId) {
+        return jpaStudyRepository.findById(studyId)
+                .orElseThrow(() -> new BaseException(StudyErrorCode.NOT_EXIST_STUDY));
+    }
+
     public void save(Study study) {
         jpaStudyRepository.save(study);
     }
