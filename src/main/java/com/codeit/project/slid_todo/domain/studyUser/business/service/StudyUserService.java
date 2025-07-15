@@ -44,6 +44,10 @@ public class StudyUserService {
         }
     }
 
+    public List<StudyUser> findAllWithStudyByUserId(Long userId) {
+        return studyUserRepository.findAllWithStudyByUserId(userId);
+    }
+
     @Transactional
     public void saveLeader(User user, Study study) {
         StudyUser studyUser = StudyUser.builder()
