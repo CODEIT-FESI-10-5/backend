@@ -22,8 +22,4 @@ public class DomainStudyRepository {
         jpaStudyRepository.save(study);
     }
 
-    public Study getByIdOrThrow(Long id) {
-        return jpaStudyRepository.findById(id)
-                .orElseThrow(() -> new BaseException(StudyErrorCode.NOT_EXIST_STUDY));
-    }
 }
