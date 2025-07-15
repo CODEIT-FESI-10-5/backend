@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UploadImg {
     private String realImgName;
-    private String storeImgName;
+    private String storeImgDir;
 }

@@ -29,7 +29,7 @@ public class StudyService {
         Study study = studyRepository.getByIdOrThrow(studyId);
 
         if (uploadImg != null && study.getImage() != null) {
-            imgStore.deleteImage(study.getImage().getStoreImgName());
+            imgStore.deleteImage(study.getImage().getStoreImgDir());
         }
 
         study.updateStudy(title, description, uploadImg);

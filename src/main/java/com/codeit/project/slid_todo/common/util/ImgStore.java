@@ -32,7 +32,7 @@ public class ImgStore {
 
         image.transferTo(new File(getFullPath(storeFileName)));
 
-        return new UploadImg(originalFileName, storeFileName);
+        return new UploadImg(originalFileName, getFullPath(storeFileName));
     }
 
     private boolean isEmpty(MultipartFile file) {
@@ -71,8 +71,8 @@ public class ImgStore {
         return Paths.get(ImgDir, storeFileName).toString();
     }
 
-    public void deleteImage(String storeFileName) {
-        File file = new File(getFullPath(storeFileName));
+    public void deleteImage(String storeFileDir) {
+        File file = new File(storeFileDir);
         if (file.exists()) {
             file.delete();
         }
