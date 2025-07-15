@@ -20,12 +20,12 @@ public class DomainStudyUserRepository {
     }
 
     public StudyUser getOrThrowIfNotJoined(Long studyId, Long userId) {
-        return jpaStudyUserRepository.findByStudyIdAndUserId(studyId, userId)
+        return jpaStudyUserRepository.findByStudyIdAndUserIdAndIsDeletedFalse(studyId, userId)
                 .orElseThrow(() -> new BaseException(StudyUserErrorCode.STUDY_USER_NOT_FOUND));
     }
 
     public StudyUser findByStudyIdAndUserId(Long studyId, Long userId) {
-        return jpaStudyUserRepository.findByStudyIdAndUserId(studyId, userId).orElse(null);
+        return jpaStudyUserRepository.findByStudyIdAndUserIdAndIsDeletedFalse(studyId, userId).orElse(null);
     }
 
     public StudyUser getByIdOrThrow(Long studyUserId) {

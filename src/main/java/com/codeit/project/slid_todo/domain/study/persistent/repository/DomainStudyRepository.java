@@ -23,6 +23,6 @@ public class DomainStudyRepository {
     }
 
     public boolean existsByInviteCode(String code) {
-        return jpaStudyRepository.existsByInviteCode(code);
+        return jpaStudyRepository.existsByInviteCodeAndIsDeletedFalse(code);
     }
 }
