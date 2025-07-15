@@ -3,6 +3,7 @@ package com.codeit.project.slid_todo.application.studyManage.web.controller;
 import com.codeit.project.slid_todo.application.studyManage.business.service.StudyManageFacade;
 import com.codeit.project.slid_todo.application.studyManage.web.dto.EditStudyDto;
 import com.codeit.project.slid_todo.application.studyManage.web.dto.JoinStudyDto;
+import com.codeit.project.slid_todo.application.studyManage.web.dto.StudyDetailsDto;
 import com.codeit.project.slid_todo.application.studyManage.web.dto.StudyListDto;
 import com.codeit.project.slid_todo.common.annotation.CheckStudyLeader;
 import com.codeit.project.slid_todo.common.annotation.CurrentUser;
@@ -69,6 +70,22 @@ public class StudyManageController {
         StudyListDto.Response responseData = studyManageFacade.getStudyList(userId);
 
         ResponseDto<StudyListDto.Response> response = ResponseDto.<StudyListDto.Response>builder()
+                .httpStatusCode(HttpStatus.OK.value())
+                .data(responseData)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/api/study/{studyId}")
+    public ResponseEntity<ResponseDto<StudyDetailsDto.Response>> getStudyDetail(
+            @PathVariable Long studyId,
+            @CurrentUser Long userId
+    ) {
+
+        StudyDetailsDto.Response responseData = studyManageFacade.getStudyDetail(studyId, userId);
+
+         ResponseDto<StudyDetailsDto.Response> response = ResponseDto.<StudyDetailsDto.Response>builder()
                 .httpStatusCode(HttpStatus.OK.value())
                 .data(responseData)
                 .build();
