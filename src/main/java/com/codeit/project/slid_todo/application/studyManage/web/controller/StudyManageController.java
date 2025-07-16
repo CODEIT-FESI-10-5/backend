@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,10 @@ public class StudyManageController {
     }
 
     @CheckStudyLeader
-    @PatchMapping("/api/study/{studyId}")
+    @PatchMapping(
+            value= "/api/study/{studyId}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     @Operation(summary = "스터디 수정", description = "스터디 제목, 설명, 이미지를 수정합니다.")
     public ResponseEntity<ResponseDto<Void>> editStudy(
             @ModelAttribute EditStudyDto.Request editStudyDto,
@@ -96,7 +100,7 @@ public class StudyManageController {
 
         StudyDetailsDto.Response responseData = studyManageFacade.getStudyDetail(studyId, userId);
 
-         ResponseDto<StudyDetailsDto.Response> response = ResponseDto.<StudyDetailsDto.Response>builder()
+        ResponseDto<StudyDetailsDto.Response> response = ResponseDto.<StudyDetailsDto.Response>builder()
                 .httpStatusCode(HttpStatus.OK.value())
                 .data(responseData)
                 .build();

@@ -1,8 +1,8 @@
 package com.codeit.project.slid_todo.domain.study.business.service;
 
 import com.codeit.project.slid_todo.common.exception.BaseException;
+import com.codeit.project.slid_todo.common.util.CodeGenerator;
 import com.codeit.project.slid_todo.common.util.ImgStore;
-import com.codeit.project.slid_todo.common.util.InviteCodeGenerator;
 import com.codeit.project.slid_todo.common.vo.UploadImg;
 import com.codeit.project.slid_todo.domain.study.errorCode.StudyErrorCode;
 import com.codeit.project.slid_todo.domain.study.persistent.entity.Study;
@@ -33,7 +33,7 @@ public class StudyService {
      private String generateUniqueInviteCode() {
         String code;
         do {
-            code = InviteCodeGenerator.generate();
+            code = CodeGenerator.generate(8);
         } while (studyRepository.existsByInviteCode(code));
         return code;
     }

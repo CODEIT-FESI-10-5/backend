@@ -1,10 +1,15 @@
 package com.codeit.project.slid_todo.domain.user.persistent.entity;
 
 import com.codeit.project.slid_todo.common.audting.BaseDateTime;
+import com.codeit.project.slid_todo.common.util.CodeGenerator;
+import com.codeit.project.slid_todo.common.vo.UploadImg;
 import com.codeit.project.slid_todo.domain.refreshToken.persistent.entity.RefreshToken;
 import com.codeit.project.slid_todo.domain.studyUser.persistent.entity.StudyUser;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +30,11 @@ public class User extends BaseDateTime {
 
     private String name;
 
+    @Column(unique = true)
+    private String nickname;
+
+    private UploadImg img;
+
     private boolean isDeleted = Boolean.FALSE;
 
     @OneToMany(mappedBy = "user")
@@ -39,5 +49,23 @@ public class User extends BaseDateTime {
         this.email = email;
         this.password = password;
         this.name = name;
+        this.nickname = generateDefaultNickname();
+    }
+
+    private String generateDefaultNickname() {
+        return "user_" + CodeGenerator.generate(6);
+    }
+
+    public boolean hasCustomImage() {
+        return this.img != null &&
+               this.img.getStoreImgDir() != null &&
+               !this.img.getStoreImgDir().isBlank();
+    }
+
+    public void updateProfile(String nickname, UploadImg img) {
+        if(nickname != null) {
+            this.nickname = nickname;
+        }
+        this.img = img;
     }
 }
