@@ -7,9 +7,10 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record StudyDetailsDto () {
+public record StudyDetailsDto() {
 
-    public record Request() {}
+    public record Request() {
+    }
 
     @Builder
     public record Response(
@@ -25,8 +26,8 @@ public record StudyDetailsDto () {
         @Builder
         private record Member(
                 Long userId,
-                String name
-//                String userImageDir
+                String name,
+                String userImageDir
         ) {
 
         }
@@ -37,7 +38,7 @@ public record StudyDetailsDto () {
                     .map(studyUser -> Member.builder()
                             .userId(studyUser.getUser().getId())
                             .name(studyUser.getUser().getName())
-//                            .userImageDir(studyUser.getUser())
+                            .userImageDir(studyUser.getUser().getImg().getStoreImgDir())
                             .build())
                     .toList();
 
