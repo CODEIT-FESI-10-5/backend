@@ -49,4 +49,10 @@ public class UserManageFacade {
         return (action == ProfileImageUpdateAction.RESET || action == ProfileImageUpdateAction.UPLOAD)
                 && user.hasCustomImage();
     }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userService.findUserById(userId);
+        user.deleteUser();
+    }
 }

@@ -68,4 +68,8 @@ public class User extends BaseDateTime {
         }
         this.img = img;
     }
+
+    public void deleteUser() {
+        this.isDeleted = Boolean.TRUE;
+    }
 }
