@@ -11,10 +11,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -35,6 +32,20 @@ public class UserManageController {
             @CurrentUser Long userId
     ) throws IOException {
         userManageFacade.editProfile(editProfileDto, userId);
+
+        ResponseDto<Void> response = ResponseDto.<Void>builder()
+                .httpStatusCode(HttpStatus.OK.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/api/user")
+    @Operation(summary = "마이페이지 회원 탈퇴", description = "회원 탈퇴 기능입니다.")
+    public ResponseEntity<ResponseDto<Void>> deleteProfile(
+            @CurrentUser Long userId) {
+
+        userManageFacade.deleteUser(userId);
 
         ResponseDto<Void> response = ResponseDto.<Void>builder()
                 .httpStatusCode(HttpStatus.OK.value())
