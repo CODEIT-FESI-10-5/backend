@@ -20,8 +20,8 @@ public class GoalManageController {
 
     private final GoalManageFacade goalManageFacade;
 
-    @GetMapping("/api/goal/{goalId}")
-    @Operation(summary = "목표 조회", description = "목표와 관련된 투두 목록, 팀 진행도를 조회합니다.")
+    @GetMapping("/api/goals/{goalId}")
+    @Operation(summary = "목표 하위 정보 조회", description = "목표와 관련된 투두 목록, 팀 진행도를 조회합니다.")
     public ResponseEntity<ResponseDto<GoalDetailResponseDto>> getGoal(
             @Parameter(description = "목표 ID", example = "1") @PathVariable Long goalId,
             @CurrentUser Long userId) {

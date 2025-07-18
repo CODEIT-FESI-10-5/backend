@@ -97,7 +97,8 @@ public class TodoManageFacade {
     }
 
     @Transactional
-    public void createTodo(Long goalId, Long userId, CreateTodoRequestDto requestDto) {
+    public void createTodo(Long userId, CreateTodoRequestDto requestDto) {
+        Long goalId = requestDto.getGoalId();
         Goal goal = goalService.getGoalById(goalId);
         StudyUser currentUser = studyUserService.getOrThrowIfNotJoined(goal.getStudy().getId(), userId);
         
@@ -114,7 +115,8 @@ public class TodoManageFacade {
     }
 
     @Transactional
-    public void updateTodo(Long goalId, Long todoId, Long userId, UpdateTodoRequestDto requestDto) {
+    public void updateTodo(Long todoId, Long userId, UpdateTodoRequestDto requestDto) {
+        Long goalId = requestDto.getGoalId();
         Goal goal = goalService.getGoalById(goalId);
         StudyUser currentUser = studyUserService.getOrThrowIfNotJoined(goal.getStudy().getId(), userId);
         
@@ -127,17 +129,4 @@ public class TodoManageFacade {
         todoService.updateTodoContentAndCompleted(todoId, requestDto.getContent(), requestDto.isCompleted());
     }
 
-    @Transactional
-    public void updateOrder(Long goalId, Long userId, UpdateOrderRequestDto requestDto) {
-        Goal goal = goalService.getGoalById(goalId);
-        StudyUser currentUser = studyUserService.getOrThrowIfNotJoined(goal.getStudy().getId(), userId);
-        
-        // 순서 변경은 스터디장만 가능
-        if (currentUser.getUserRole() != UserRole.LEADER) {
-            throw new RuntimeException("순서 변경은 스터디장만 가능합니다.");
-        }
-        
-        String priorityOrder = String.join(",", requestDto.getOrder());
-        goalService.updatePriorityOrder(goalId, priorityOrder);
-    }
 } 
