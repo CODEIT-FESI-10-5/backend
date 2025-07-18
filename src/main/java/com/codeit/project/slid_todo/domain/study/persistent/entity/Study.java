@@ -58,4 +58,8 @@ public class Study extends BaseDateTime {
             this.image = uploadImg;
         }
     }
+
+    public void deleteStudy() {
+        isDeleted = true;
+    }
 }
