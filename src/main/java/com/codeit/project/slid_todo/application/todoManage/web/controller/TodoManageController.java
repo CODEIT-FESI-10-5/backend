@@ -20,10 +20,10 @@ public class TodoManageController {
 
     private final TodoManageFacade todoManageFacade;
 
-    @GetMapping("/api/todos/{goalId}")
+    @GetMapping("/api/todos")
     @Operation(summary = "투두 목록 조회", description = "목표 하위의 투두 목록을 우선순위 순서대로 조회합니다.")
     public ResponseEntity<ResponseDto<TodoListResponseDto>> getTodos(
-            @Parameter(description = "목표 ID", example = "1") @PathVariable("goalId") Long goalId,
+            @Parameter(description = "목표 ID", example = "1") @RequestParam("goalId") Long goalId,
             @CurrentUser Long userId) {
 
         TodoListResponseDto response = todoManageFacade.getTodoList(goalId, userId);
@@ -36,14 +36,13 @@ public class TodoManageController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @PostMapping("/api/todos/{goalId}/todo")
+    @PostMapping("/api/todos")
     @Operation(summary = "투두 생성", description = "새로운 투두를 생성합니다. 공통 투두는 스터디장만 생성 가능합니다.")
     public ResponseEntity<ResponseDto<Void>> createTodo(
-            @Parameter(description = "목표 ID", example = "1") @PathVariable("goalId") Long goalId,
             @CurrentUser Long userId,
             @Valid @RequestBody CreateTodoRequestDto requestDto) {
 
-        todoManageFacade.createTodo(goalId, userId, requestDto);
+        todoManageFacade.createTodo(userId, requestDto);
 
         ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
                 .httpStatusCode(HttpStatus.CREATED.value())
@@ -52,15 +51,14 @@ public class TodoManageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
-    @PatchMapping("/api/todos/{goalId}/todo/{todoIdValue}")
+    @PatchMapping("/api/todos/{todoId}")
     @Operation(summary = "투두 수정", description = "기존 투두의 내용과 완료 상태를 수정합니다.")
     public ResponseEntity<ResponseDto<Void>> updateTodo(
-            @Parameter(description = "목표 ID", example = "1") @PathVariable("goalId") Long goalId,
-            @Parameter(description = "투두 ID", example = "1") @PathVariable("todoIdValue") Long todoId,
+            @Parameter(description = "투두 ID", example = "1") @PathVariable("todoId") Long todoId,
             @CurrentUser Long userId,
             @Valid @RequestBody UpdateTodoRequestDto requestDto) {
 
-        todoManageFacade.updateTodo(goalId, todoId, userId, requestDto);
+        todoManageFacade.updateTodo(todoId, userId, requestDto);
 
         ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
                 .httpStatusCode(HttpStatus.OK.value())
@@ -69,19 +67,4 @@ public class TodoManageController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @PatchMapping("/api/todos/{goalId}/order")
-    @Operation(summary = "투두 순서 변경", description = "투두의 우선순위 순서를 변경합니다. 스터디장만 가능합니다.")
-    public ResponseEntity<ResponseDto<Void>> updateOrder(
-            @Parameter(description = "목표 ID", example = "1") @PathVariable("goalId") Long goalId,
-            @CurrentUser Long userId,
-            @Valid @RequestBody UpdateOrderRequestDto requestDto) {
-
-        todoManageFacade.updateOrder(goalId, userId, requestDto);
-
-        ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
-                .httpStatusCode(HttpStatus.OK.value())
-                .build();
-
-        return ResponseEntity.ok(responseDto);
-    }
 } 
