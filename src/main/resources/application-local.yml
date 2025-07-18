@@ -20,3 +20,6 @@ spring:
 
 img:
   dir:
+
+springdoc:
+  use-fqn: true
