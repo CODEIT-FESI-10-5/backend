@@ -110,6 +110,7 @@ public class StudyManageController {
 
     @CheckStudyLeader
     @DeleteMapping("/api/study/{studyId}")
+    @Operation(summary = "스터디 삭제", description = "스터디 삭제 기능입니다.")
     public ResponseEntity<ResponseDto<Void>> deleteStudy(
             @Parameter(description = "스터디 ID") @PathVariable Long studyId,
             @Parameter(hidden = true) @CurrentUser Long userId
