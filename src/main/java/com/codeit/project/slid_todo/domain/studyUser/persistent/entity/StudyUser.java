@@ -59,4 +59,8 @@ public class StudyUser extends BaseDateTime {
             user.getStudyUsers().add(this);
         }
     }
+
+    public void deleteStudyUser() {
+        this.isDeleted = true;
+    }
 }

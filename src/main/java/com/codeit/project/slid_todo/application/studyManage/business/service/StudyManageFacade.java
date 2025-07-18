@@ -78,4 +78,13 @@ public class StudyManageFacade {
 
         return totalCount > 0 ? (int) ((completedCount * 100) / totalCount) : 0;
     }
+
+    @Transactional
+    public void deleteStudy(Long studyId, Long userId) {
+        Study study = studyService.findByStudyId(studyId);
+        StudyUser studyUser = studyUserService.getOrThrowIfNotJoined(studyId, userId);
+
+        study.deleteStudy();
+        studyUser.deleteStudyUser();
+    }
 }
