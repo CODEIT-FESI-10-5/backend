@@ -96,9 +96,25 @@ public class StudyManageController {
 
         StudyDetailsDto.Response responseData = studyManageFacade.getStudyDetail(studyId, userId);
 
-         ResponseDto<StudyDetailsDto.Response> response = ResponseDto.<StudyDetailsDto.Response>builder()
+        ResponseDto<StudyDetailsDto.Response> response = ResponseDto.<StudyDetailsDto.Response>builder()
                 .httpStatusCode(HttpStatus.OK.value())
                 .data(responseData)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @CheckStudyLeader
+    @DeleteMapping("/api/study/{studyId}")
+    public ResponseEntity<ResponseDto<Void>> deleteStudy(
+            @Parameter(description = "스터디 ID") @PathVariable Long studyId,
+            @Parameter(hidden = true) @CurrentUser Long userId
+    ) {
+
+        studyManageFacade.deleteStudy(studyId, userId);
+
+        ResponseDto<Void> response = ResponseDto.<Void>builder()
+                .httpStatusCode(HttpStatus.OK.value())
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
