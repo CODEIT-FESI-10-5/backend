@@ -1,10 +1,7 @@
 package com.codeit.project.slid_todo.application.studyManage.web.controller;
 
 import com.codeit.project.slid_todo.application.studyManage.business.service.StudyManageFacade;
-import com.codeit.project.slid_todo.application.studyManage.web.dto.EditStudyDto;
-import com.codeit.project.slid_todo.application.studyManage.web.dto.JoinStudyDto;
-import com.codeit.project.slid_todo.application.studyManage.web.dto.StudyDetailsDto;
-import com.codeit.project.slid_todo.application.studyManage.web.dto.StudyListDto;
+import com.codeit.project.slid_todo.application.studyManage.web.dto.*;
 import com.codeit.project.slid_todo.common.annotation.CheckStudyLeader;
 import com.codeit.project.slid_todo.common.annotation.CurrentUser;
 import com.codeit.project.slid_todo.common.dto.ResponseDto;
@@ -41,17 +38,33 @@ public class StudyManageController {
     }
 
     @CheckStudyLeader
-    @PatchMapping(
-            value= "/api/study/{studyId}",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    @Operation(summary = "스터디 수정", description = "스터디 제목, 설명, 이미지를 수정합니다.")
+    @PatchMapping("/api/study/{studyId}/info")
+    @Operation(summary = "스터디 정보 수정", description = "스터디 제목과 설명을 수정합니다.")
     public ResponseEntity<ResponseDto<Void>> editStudy(
-            @ModelAttribute EditStudyDto.Request editStudyDto,
+            @RequestBody EditStudyInfoDto.Request editStudyDto,
             @Parameter(description = "스터디 ID") @PathVariable Long studyId,
             @Parameter(hidden = true) @CurrentUser Long userId) throws IOException {
 
-        studyManageFacade.updateStudy(editStudyDto, studyId);
+        studyManageFacade.updateStudyInfo(editStudyDto, studyId);
+
+        ResponseDto<Void> response = ResponseDto.<Void>builder()
+                .httpStatusCode(HttpStatus.OK.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @CheckStudyLeader
+    @PatchMapping(
+            value = "/api/study/{studyId}/image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "스터디 이미지 수정", description = "스터디 이미지를 수정합니다.")
+    public ResponseEntity<ResponseDto<Void>> editStudyImage(
+            @ModelAttribute EditStudyImageDto.Request dto,
+            @Parameter(description = "스터디 ID") @PathVariable Long studyId,
+            @Parameter(hidden = true) @CurrentUser Long userId) throws IOException {
+
+        studyManageFacade.updateStudyImage(dto, studyId);
 
         ResponseDto<Void> response = ResponseDto.<Void>builder()
                 .httpStatusCode(HttpStatus.OK.value())
