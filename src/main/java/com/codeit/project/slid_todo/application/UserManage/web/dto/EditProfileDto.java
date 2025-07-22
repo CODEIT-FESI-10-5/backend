@@ -21,7 +21,11 @@ public record EditProfileDto () {
             ProfileImageUpdateAction profileImageAction,
 
             @Schema(description = "새 프로필 이미지 파일 (UPLOAD일 경우 필수)", type = "string", format = "binary")
-            MultipartFile newImageFile
+            MultipartFile newImageFile,
+
+            String currentPassword,
+
+            String newPassword
     ) {}
 
     public record Response() {}

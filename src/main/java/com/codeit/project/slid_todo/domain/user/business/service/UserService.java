@@ -1,5 +1,7 @@
 package com.codeit.project.slid_todo.domain.user.business.service;
 
+import com.codeit.project.slid_todo.common.exception.BaseException;
+import com.codeit.project.slid_todo.domain.user.errorCode.UserErrorCode;
 import com.codeit.project.slid_todo.domain.user.persistent.entity.User;
 import com.codeit.project.slid_todo.domain.user.persistent.repository.DomainUserRepository;
 import jakarta.transaction.Transactional;
@@ -30,6 +32,14 @@ public class UserService {
 
     private void validateDuplicateEmail(String email) {
         userRepository.assertEmailNotExists(email);
+    }
+
+    public void changePassword(User user, String currentPassword, String newPassword) {
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new BaseException(UserErrorCode.PASSWORD_NOT_MATCH);
+        }
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
+        user.updatePassword(encodedNewPassword);
     }
 
     public User findUserById(Long userId) {

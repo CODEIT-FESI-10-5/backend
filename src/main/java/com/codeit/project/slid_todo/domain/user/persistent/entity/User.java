@@ -58,18 +58,25 @@ public class User extends BaseDateTime {
 
     public boolean hasCustomImage() {
         return this.img != null &&
-               this.img.getStoreImgDir() != null &&
-               !this.img.getStoreImgDir().isBlank();
+                this.img.getStoreImgDir() != null &&
+                !this.img.getStoreImgDir().isBlank();
     }
 
     public void updateProfile(String nickname, UploadImg img) {
-        if(nickname != null) {
+        if (nickname != null) {
             this.nickname = nickname;
         }
         this.img = img;
     }
 
+    public void updatePassword(String encodedNewPassword) {
+        if(encodedNewPassword != null) {
+            this.password = encodedNewPassword;
+        }
+    }
+
     public void deleteUser() {
         this.isDeleted = Boolean.TRUE;
     }
+
 }
