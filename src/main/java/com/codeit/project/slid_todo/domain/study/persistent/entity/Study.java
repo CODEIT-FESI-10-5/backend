@@ -47,13 +47,16 @@ public class Study extends BaseDateTime {
         this.inviteCode = inviteCode;
     }
 
-    public void updateStudy(String title, String description, UploadImg uploadImg) {
+    public void updateStudyInfo(String title, String description) {
         if(title != null) {
             this.title = title;
         }
         if(description != null) {
             this.description = description;
         }
+    }
+
+    public void updateStudyImage(UploadImg uploadImg) {
         if(uploadImg != null) {
             this.image = uploadImg;
         }

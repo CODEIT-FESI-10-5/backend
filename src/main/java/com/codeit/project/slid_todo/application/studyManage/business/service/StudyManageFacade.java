@@ -1,9 +1,6 @@
 package com.codeit.project.slid_todo.application.studyManage.business.service;
 
-import com.codeit.project.slid_todo.application.studyManage.web.dto.EditStudyDto;
-import com.codeit.project.slid_todo.application.studyManage.web.dto.JoinStudyDto;
-import com.codeit.project.slid_todo.application.studyManage.web.dto.StudyDetailsDto;
-import com.codeit.project.slid_todo.application.studyManage.web.dto.StudyListDto;
+import com.codeit.project.slid_todo.application.studyManage.web.dto.*;
 import com.codeit.project.slid_todo.common.util.ImgStore;
 import com.codeit.project.slid_todo.common.vo.UploadImg;
 import com.codeit.project.slid_todo.domain.study.business.service.StudyService;
@@ -40,14 +37,19 @@ public class StudyManageFacade {
     }
 
     @Transactional
-    public void updateStudy(EditStudyDto.Request editStudyDto, Long studyId) throws IOException {
-        String title = editStudyDto.title();
-        String description = editStudyDto.description();
+    public void updateStudyInfo(EditStudyInfoDto.Request editStudyInfoDto, Long studyId) throws IOException {
+        String title = editStudyInfoDto.title();
+        String description = editStudyInfoDto.description();
 
-        MultipartFile image = editStudyDto.image();
+        studyService.updateStudyInfo(studyId, title, description);
+    }
+
+    @Transactional
+    public void updateStudyImage(EditStudyImageDto.Request editStudyImageDto, Long studyId) throws IOException {
+        MultipartFile image = editStudyImageDto.image();
         UploadImg uploadImg = imgStore.storeImg(image);
 
-        studyService.updateStudy(studyId, title, description, uploadImg);
+        studyService.updateStudyImage(studyId, uploadImg);
     }
 
     @Transactional
