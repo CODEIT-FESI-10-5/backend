@@ -1,6 +1,5 @@
 package com.codeit.project.slid_todo.common.config;
 
-import com.codeit.project.slid_todo.common.security.filter.JwtAuthenticationFilter;
 import com.codeit.project.slid_todo.common.security.filter.JwtVerificationFilter;
 import com.codeit.project.slid_todo.common.security.handler.*;
 import com.codeit.project.slid_todo.common.security.jwt.JwtProperties;
@@ -20,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
             "/api/user/signup",
-            "/api/login",
+            "/api/auth/login",
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/v3/api-docs/**",
@@ -55,9 +55,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            HttpSession httpSession,
                                            JwtProperties jwtProperties,
-                                           JwtProvider jwtProvider,
-                                           AuthenticationManager authenticationManager,
-                                           CustomAuthenticationSuccessHandler successHandler) throws Exception {
+                                           JwtProvider jwtProvider) throws Exception {
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -72,8 +70,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
 
         http
-                .addFilterBefore(new JwtVerificationFilter(jwtProvider, jwtProperties), JwtAuthenticationFilter.class)
-                .addFilterAt(jwtAuthenticationFilter(authenticationManager, successHandler), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtVerificationFilter(jwtProvider, jwtProperties), UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout.logoutSuccessHandler(logoutSuccessHandler).logoutUrl("/api/logout"))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authenticationEntryPoint)
@@ -82,14 +79,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager authenticationManager,
-                                                           CustomAuthenticationSuccessHandler successHandler) {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(objectMapper);
-        filter.setFilterProcessesUrl("/api/login");
-        filter.setAuthenticationManager(authenticationManager);
-        filter.setAuthenticationSuccessHandler(successHandler);
-        filter.setAuthenticationFailureHandler(failureHandler);
-        return filter;
-    }
+
 
 }

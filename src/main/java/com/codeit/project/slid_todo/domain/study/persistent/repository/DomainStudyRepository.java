@@ -25,4 +25,8 @@ public class DomainStudyRepository {
     public boolean existsByInviteCode(String code) {
         return jpaStudyRepository.existsByInviteCodeAndIsDeletedFalse(code);
     }
+
+    public Study findByTitle(String title) {
+        return jpaStudyRepository.findByTitle(title);
+    }
 }

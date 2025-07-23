@@ -27,6 +27,10 @@ public class DomainUserRepository {
                 .orElseThrow(() -> new BaseException(UserErrorCode.NOT_EXIST_USER));
     }
 
+    public User findByEmail(String email) {
+        return jpaUserRepository.findByEmailAndIsDeletedFalse(email).orElse(null);
+    }
+
     public User getByIdOrThrow(Long id) {
         return jpaUserRepository.findById(id)
                 .orElseThrow(() -> new BaseException(UserErrorCode.NOT_EXIST_USER));

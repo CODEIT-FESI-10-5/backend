@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface JpaStudyRepository extends JpaRepository<Study, Long> {
     boolean existsByInviteCodeAndIsDeletedFalse(String code);
+    Study findByTitle(String title);
 }

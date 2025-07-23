@@ -1,5 +1,7 @@
 package com.codeit.project.slid_todo.application.auth.business;
 
+import com.codeit.project.slid_todo.application.auth.web.dto.LoginRequestDto;
+import com.codeit.project.slid_todo.application.auth.web.dto.LoginResponseDto;
 import com.codeit.project.slid_todo.application.auth.web.dto.SignupDto;
 import com.codeit.project.slid_todo.common.security.dto.RefreshTokenDto;
 import com.codeit.project.slid_todo.common.security.errorCode.AuthErrorCode;
@@ -18,6 +20,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -32,6 +35,7 @@ public class AuthFacade {
     private final JwtProperties jwtProperties;
     private final JwtProvider jwtProvider;
     private final CookieUtils cookieUtils;
+    private final PasswordEncoder passwordEncoder;
 
     public void registerUser(SignupDto.Request requestDto) {
         userService.registerUser(
@@ -39,6 +43,32 @@ public class AuthFacade {
                 requestDto.email(),
                 requestDto.password()
         );
+    }
+
+    public LoginResponseDto login(LoginRequestDto requestDto) {
+        User user = userService.findByEmail(requestDto.email());
+        
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(requestDto.password(), user.getPassword())) {
+            throw new RuntimeException("아이디 또는 비밀번호가 올바르지 않습니다.");
+        }
+        
+        // JWT 토큰 생성
+        String accessToken = jwtProvider.generateAccessToken(user.getEmail(), user.getId());
+        String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
+        Date refreshTokenExpiry = jwtProvider.getClaims(refreshToken).getExpiration();
+        
+        // Refresh Token 저장
+        refreshTokenService.registerRefreshToken(user, refreshToken, refreshTokenExpiry);
+        
+        return LoginResponseDto.builder()
+                .userId(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     public void registerRefreshToken(RefreshTokenDto refreshTokenDto) {

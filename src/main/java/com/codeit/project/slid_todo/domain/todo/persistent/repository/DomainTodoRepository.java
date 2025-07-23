@@ -49,4 +49,16 @@ public class DomainTodoRepository {
     public void save(Todo todo) {
         jpaTodoRepository.save(todo);
     }
+
+    public List<Todo> findRecentCompletedTodosByGoalIdAndUserId(Long goalId, Long userId) {
+        return jpaTodoRepository.findRecentCompletedTodosByGoalIdAndUserId(goalId, userId);
+    }
+
+    public List<Todo> findInProgressTodosByGoalIdAndUserId(Long goalId, Long userId) {
+        return jpaTodoRepository.findInProgressTodosByGoalIdAndUserId(goalId, userId);
+    }
+
+    public List<Todo> findByGoalId(Long goalId) {
+        return jpaTodoRepository.findByGoalId(goalId);
+    }
 } 
