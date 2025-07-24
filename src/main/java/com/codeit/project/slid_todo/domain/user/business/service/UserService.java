@@ -1,6 +1,7 @@
 package com.codeit.project.slid_todo.domain.user.business.service;
 
 import com.codeit.project.slid_todo.common.exception.BaseException;
+import com.codeit.project.slid_todo.common.vo.UploadImg;
 import com.codeit.project.slid_todo.domain.user.errorCode.UserErrorCode;
 import com.codeit.project.slid_todo.domain.user.persistent.entity.User;
 import com.codeit.project.slid_todo.domain.user.persistent.repository.DomainUserRepository;
@@ -17,12 +18,14 @@ public class UserService {
     private final DomainUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void registerUser(String name, String email, String password) {
+    public void registerUser(String nickname, String email, String password) {
         validateDuplicateEmail(email);
+
+        validateDuplicateNickname(nickname);
 
         String encodedPassword = passwordEncoder.encode(password);
         User user = User.builder()
-                .name(name)
+                .nickname(nickname)
                 .email(email)
                 .password(encodedPassword)
                 .build();
@@ -34,12 +37,22 @@ public class UserService {
         userRepository.assertEmailNotExists(email);
     }
 
+    private void validateDuplicateNickname(String nickname) {
+        userRepository.assertNickNameNotExists(nickname);
+    }
+
     public void changePassword(User user, String currentPassword, String newPassword) {
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
             throw new BaseException(UserErrorCode.PASSWORD_NOT_MATCH);
         }
         String encodedNewPassword = passwordEncoder.encode(newPassword);
         user.updatePassword(encodedNewPassword);
+    }
+
+    public User updateProfile(User user, String nickname, UploadImg UploadImg) {
+        validateDuplicateNickname(nickname);
+        user.updateProfile(nickname, UploadImg);
+        return user;
     }
 
     public User findUserById(Long userId) {

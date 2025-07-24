@@ -87,7 +87,7 @@ public class GoalManageFacade {
             String completedCt = completedCount + "/" + totalCount;
             
             teamProgress.add(GoalDetailResponseDto.TeamProgressData.builder()
-                    .name(studyUser.getUser().getName())
+                    .name(studyUser.getUser().getNickname())
                     .image("") // TODO: 사용자 이미지 필드 추가 필요
                     .progress(progress)
                     .completedCt(completedCt)

@@ -8,8 +8,9 @@ import org.springframework.http.HttpStatus;
 public enum UserErrorCode implements ErrorCode {
 
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER_001", "이미 존재하는 이메일입니다."),
-    NOT_EXIST_USER(HttpStatus.NOT_FOUND, "USER_002", "해당 사용자가 존재하지 않습니다."),
-    PASSWORD_NOT_MATCH(HttpStatus.UNAUTHORIZED, "USER_003", "현재 비밀번호가 일치하지 않습니다.");
+    NICKNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER_002", "이미 존재하는 닉네임입니다."),
+    NOT_EXIST_USER(HttpStatus.NOT_FOUND, "USER_003", "해당 사용자가 존재하지 않습니다."),
+    PASSWORD_NOT_MATCH(HttpStatus.UNAUTHORIZED, "USER_004", "현재 비밀번호가 일치하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

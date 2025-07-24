@@ -41,7 +41,7 @@ public class AuthFacade {
 
     public void registerUser(SignupDto.Request requestDto) {
         userService.registerUser(
-                requestDto.name(),
+                requestDto.nickname(),
                 requestDto.email(),
                 requestDto.password()
         );
