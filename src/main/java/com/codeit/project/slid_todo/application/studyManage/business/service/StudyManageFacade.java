@@ -7,6 +7,7 @@ import com.codeit.project.slid_todo.domain.study.business.service.StudyService;
 import com.codeit.project.slid_todo.domain.study.persistent.entity.Study;
 import com.codeit.project.slid_todo.domain.studyUser.business.service.StudyUserService;
 import com.codeit.project.slid_todo.domain.studyUser.persistent.entity.StudyUser;
+import com.codeit.project.slid_todo.domain.studyUser.persistent.entity.enums.UserRole;
 import com.codeit.project.slid_todo.domain.todo.business.service.TodoService;
 import com.codeit.project.slid_todo.domain.user.business.service.UserService;
 import com.codeit.project.slid_todo.domain.user.persistent.entity.User;
@@ -71,7 +72,13 @@ public class StudyManageFacade {
         List<StudyUser> studyUserList = studyUserService.findAllWithUserByStudyId(studyId);
         int totalProgress = calculateTeamTotalProgress(studyId);
 
-        return StudyDetailsDto.Response.from(study, studyUserList, totalProgress);
+        UserRole currentUserRole = studyUserList.stream()
+                .filter(su -> su.getUser().getId().equals(userId))
+                .map(StudyUser::getUserRole)
+                .findFirst()
+                .orElse(null);
+
+        return StudyDetailsDto.Response.from(study, currentUserRole, studyUserList, totalProgress);
     }
 
     private int calculateTeamTotalProgress(Long studyId) {
