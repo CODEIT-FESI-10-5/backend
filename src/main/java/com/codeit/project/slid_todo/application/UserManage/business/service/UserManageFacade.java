@@ -26,7 +26,7 @@ public class UserManageFacade {
 
         UploadImg newImage = handleProfileImageUpdate(dto, user);
 
-        user.updateProfile(dto.nickname(), newImage);
+        user = userService.updateProfile(user, dto.nickname(), newImage);
 
         if (dto.currentPassword() != null && dto.newPassword() != null) {
             userService.changePassword(user, dto.currentPassword(), dto.newPassword());

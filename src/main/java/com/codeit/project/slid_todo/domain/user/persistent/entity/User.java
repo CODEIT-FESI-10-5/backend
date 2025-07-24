@@ -1,7 +1,6 @@
 package com.codeit.project.slid_todo.domain.user.persistent.entity;
 
 import com.codeit.project.slid_todo.common.audting.BaseDateTime;
-import com.codeit.project.slid_todo.common.util.CodeGenerator;
 import com.codeit.project.slid_todo.common.vo.UploadImg;
 import com.codeit.project.slid_todo.domain.refreshToken.persistent.entity.RefreshToken;
 import com.codeit.project.slid_todo.domain.studyUser.persistent.entity.StudyUser;
@@ -29,8 +28,6 @@ public class User extends BaseDateTime {
 
     private String password;
 
-    private String name;
-
     @Column(unique = true)
     private String nickname;
 
@@ -45,16 +42,11 @@ public class User extends BaseDateTime {
     private List<StudyUser> studyUsers = new ArrayList<>();
 
     @Builder
-    public User(List<RefreshToken> refreshTokens, String email, String password, String name) {
+    public User(List<RefreshToken> refreshTokens, String email, String password, String nickname) {
         this.refreshTokens = refreshTokens;
         this.email = email;
         this.password = password;
-        this.name = name;
-        this.nickname = generateDefaultNickname();
-    }
-
-    private String generateDefaultNickname() {
-        return "user_" + CodeGenerator.generate(6);
+        this.nickname = nickname;
     }
 
     public boolean hasCustomImage() {

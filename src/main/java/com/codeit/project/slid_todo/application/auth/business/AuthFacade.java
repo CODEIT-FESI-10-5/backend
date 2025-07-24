@@ -41,37 +41,37 @@ public class AuthFacade {
 
     public void registerUser(SignupDto.Request requestDto) {
         userService.registerUser(
-                requestDto.name(),
+                requestDto.nickname(),
                 requestDto.email(),
                 requestDto.password()
         );
     }
 
-//    public LoginResponseDto login(LoginRequestDto requestDto) {
-//        User user = userService.findByEmail(requestDto.email());
-//
-//        // 비밀번호 검증
-//        if (!passwordEncoder.matches(requestDto.password(), user.getPassword())) {
-//            throw new RuntimeException("아이디 또는 비밀번호가 올바르지 않습니다.");
-//        }
-//
-//        // JWT 토큰 생성
-//        String accessToken = jwtProvider.generateAccessToken(user.getEmail(), user.getId());
-//        String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
-//        Date refreshTokenExpiry = jwtProvider.getClaims(refreshToken).getExpiration();
-//
-//        // Refresh Token 저장
-//        refreshTokenService.registerRefreshToken(user, refreshToken, refreshTokenExpiry);
-//
-//        return LoginResponseDto.builder()
-//                .userId(user.getId())
-//                .name(user.getName())
-//                .email(user.getEmail())
-//                .nickname(user.getNickname())
-//                .accessToken(accessToken)
-//                .refreshToken(refreshToken)
-//                .build();
-//    }
+    public LoginResponseDto login(LoginRequestDto requestDto) {
+        User user = userService.findByEmail(requestDto.email());
+
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(requestDto.password(), user.getPassword())) {
+            throw new RuntimeException("아이디 또는 비밀번호가 올바르지 않습니다.");
+        }
+
+        // JWT 토큰 생성
+        String accessToken = jwtProvider.generateAccessToken(user.getEmail(), user.getId());
+        String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
+        Date refreshTokenExpiry = jwtProvider.getClaims(refreshToken).getExpiration();
+
+        // Refresh Token 저장
+        refreshTokenService.registerRefreshToken(user, refreshToken, refreshTokenExpiry);
+
+        return LoginResponseDto.builder()
+                .userId(user.getId())
+                .name(user.getNickname())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 
     public void registerRefreshToken(RefreshTokenDto refreshTokenDto) {
         User user = userService.findUserById(refreshTokenDto.userId());

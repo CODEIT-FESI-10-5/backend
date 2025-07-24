@@ -8,9 +8,9 @@ public record SignupDto () {
 
     @Schema(description = "회원가입 요청")
     public record Request(
-            @NotNull(message = "이름은 필수값입니다")
-            @Schema(description = "사용자 이름", example = "김철수")
-            String name,
+            @NotNull(message = "닉네임은 필수값입니다")
+            @Schema(description = "닉네임", example = "nickname")
+            String nickname,
 
             @Email
             @NotNull(message = "이메일은 필수값입니다")

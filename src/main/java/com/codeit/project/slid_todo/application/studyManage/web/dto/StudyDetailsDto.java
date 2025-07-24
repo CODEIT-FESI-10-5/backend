@@ -26,7 +26,7 @@ public record StudyDetailsDto() {
         @Builder
         private record Member(
                 Long userId,
-                String name,
+                String nickname,
                 String userImageDir
         ) {
 
@@ -37,7 +37,7 @@ public record StudyDetailsDto() {
             List<Member> memberList = studyUserList.stream()
                     .map(studyUser -> Member.builder()
                             .userId(studyUser.getUser().getId())
-                            .name(studyUser.getUser().getName())
+                            .nickname(studyUser.getUser().getNickname())
                             .userImageDir(studyUser.getUser().getImg().getStoreImgDir())
                             .build())
                     .toList();

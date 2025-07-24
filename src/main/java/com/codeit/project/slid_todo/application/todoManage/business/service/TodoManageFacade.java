@@ -211,7 +211,7 @@ public class TodoManageFacade {
                                 int userProgress = userTotalCount > 0 ? (int) ((userCompletedCount * 100) / userTotalCount) : 0;
                                 
                                 return DashboardResponseDto.TeamProgressData.builder()
-                                        .name(user.getName())
+                                        .name(user.getNickname())
                                         .image(user.getImg() != null ? user.getImg().getStoreImgDir() : null)
                                         .progress(userProgress)
                                         .completedCt(userCompletedCount + "/" + userTotalCount)

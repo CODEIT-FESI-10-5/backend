@@ -22,6 +22,13 @@ public class DomainUserRepository {
                 });
     }
 
+    public void assertNickNameNotExists(String nickname) {
+        jpaUserRepository.findByNicknameAndIsDeletedFalse(nickname)
+                .ifPresent(user -> {
+                    throw new BaseException(UserErrorCode.NICKNAME_ALREADY_EXISTS);
+                });
+    }
+
     public User getByEmailOrThrow(String email) {
         return jpaUserRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new BaseException(UserErrorCode.NOT_EXIST_USER));
