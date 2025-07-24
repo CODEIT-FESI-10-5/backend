@@ -53,12 +53,8 @@ public class StudyService {
         study.updateStudyImage(uploadImg);
     }
 
-    public Study getStudyIfInviteCodeMatches(Long studyId, String inputCode) {
-        Study study = studyRepository.getByIdOrThrow(studyId);
-        if (!study.getInviteCode().equals(inputCode)) {
-            throw new BaseException(StudyErrorCode.INVALID_INVITE_CODE);
-        }
-        return study;
+    public Study findByInviteCode(String inviteCode) {
+        return studyRepository.getByInviteCodeOrThrow(inviteCode);
     }
 
     public Study findByStudyId(Long studyId) {

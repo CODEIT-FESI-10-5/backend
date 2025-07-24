@@ -18,6 +18,12 @@ public class DomainStudyRepository {
                 .orElseThrow(() -> new BaseException(StudyErrorCode.NOT_EXIST_STUDY));
     }
 
+    public Study getByInviteCodeOrThrow(String inviteCode) {
+        return jpaStudyRepository.findByInviteCode(inviteCode)
+                .orElseThrow(() -> new BaseException(StudyErrorCode.INVALID_INVITE_CODE));
+    }
+
+
     public Study save(Study study) {
         return jpaStudyRepository.save(study);
     }
