@@ -11,8 +11,8 @@ import java.util.List;
 @Schema(description = "대시보드 조회 응답")
 public class DashboardResponseDto {
 
-    @Schema(description = "목표 목록")
-    private List<GoalData> goals;
+    @Schema(description = "목표 데이터")
+    private GoalData goal;
 
     @Getter
     @Builder

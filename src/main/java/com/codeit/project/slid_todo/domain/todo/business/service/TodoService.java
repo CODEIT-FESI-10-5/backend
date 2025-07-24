@@ -114,4 +114,8 @@ public class TodoService {
     public List<Todo> getTodosByGoalId(Long goalId) {
         return todoRepository.findByGoalId(goalId);
     }
+
+    public void save(Todo todo) {
+        todoRepository.save(todo);
+    }
 } 
