@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum StudyUserErrorCode implements ErrorCode {
 
-    STUDY_USER_NOT_FOUND(HttpStatus.FORBIDDEN, "", "해당 스터디에 참여하고 있지 않습니다."),
-    NOT_STUDY_LEADER(HttpStatus.FORBIDDEN, "", "스터디 방장만 수행할 수 있는 작업입니다."),
-    ALREADY_JOINED(HttpStatus.CONFLICT, "", "이미 해당 스터디에 참여하셨습니다.");
+    STUDY_USER_NOT_FOUND(HttpStatus.FORBIDDEN, "STUDY_USER_001", "해당 스터디에 참여하고 있지 않습니다."),
+    NOT_STUDY_LEADER(HttpStatus.FORBIDDEN, "STUDY_USER_002", "스터디 방장만 수행할 수 있는 작업입니다."),
+    ALREADY_JOINED(HttpStatus.CONFLICT, "STUDY_USER_003", "이미 해당 스터디에 참여하셨습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
