@@ -63,9 +63,11 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         response.setCharacterEncoding("utf-8");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_OK);
-        response.addHeader(HttpHeaders.AUTHORIZATION, jwtProperties.getTokenPrefix() + accessToken);
+//        response.addHeader(HttpHeaders.AUTHORIZATION, jwtProperties.getTokenPrefix() + accessToken);
 
-        Cookie refreshTokenCookie = cookieUtils.createCookie("refreshToken", refreshToken);
+        Cookie accessTokenCookie = cookieUtils.createAccessTokenCookie(accessToken);
+        Cookie refreshTokenCookie = cookieUtils.createRefreshTokenCookie(refreshToken);
+        response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
     }
 

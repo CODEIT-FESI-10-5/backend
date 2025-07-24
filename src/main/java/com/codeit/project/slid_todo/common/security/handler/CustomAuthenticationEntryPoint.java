@@ -24,7 +24,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         AuthErrorCode errorCode = getErrorCodeByRequest(request);
 
         ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
-                .httpStatusCode(HttpServletResponse.SC_OK)
+                .httpStatusCode(HttpServletResponse.SC_UNAUTHORIZED)
                 .errorCode(errorCode.getCode())
                 .errorMessage(errorCode.getMessage())
                 .build();

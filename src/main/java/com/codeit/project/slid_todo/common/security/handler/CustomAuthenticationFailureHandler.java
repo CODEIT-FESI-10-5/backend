@@ -22,7 +22,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
-                .httpStatusCode(HttpServletResponse.SC_OK)
+                .httpStatusCode(HttpServletResponse.SC_BAD_REQUEST)
                 .errorCode(AuthErrorCode.AUTHENTICATION_FAILED.getCode())
                 .errorMessage(AuthErrorCode.AUTHENTICATION_FAILED.getMessage())
                 .build();

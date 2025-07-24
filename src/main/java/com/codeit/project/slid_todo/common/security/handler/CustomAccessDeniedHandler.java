@@ -22,7 +22,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
-                .httpStatusCode(HttpServletResponse.SC_OK)
+                .httpStatusCode(HttpServletResponse.SC_UNAUTHORIZED)
                 .errorCode(AuthErrorCode.UNAUTHENTICATED.getCode())
                 .errorMessage(AuthErrorCode.UNAUTHENTICATED.getMessage())
                 .build();
