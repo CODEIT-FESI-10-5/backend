@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,13 +35,16 @@ public class GoalManageFacade {
         // 사용자의 투두 목록 조회
         List<Todo> userTodos = todoService.getTodosByGoalIdAndUserId(goalId, userId);
         
+        // 우선순위 순서대로 정렬
+        List<Todo> sortedTodos = sortTodosByPriority(userTodos, goal.getPriorityOrder());
+        
         // 완료된 투두 개수 계산
         long completedCount = todoService.countCompletedByGoalIdAndUserId(goalId, userId);
         long totalCount = todoService.countByGoalIdAndUserId(goalId, userId);
         String completedCt = completedCount + "/" + totalCount;
         
         // 사용자의 투두 데이터 생성 (N+1 문제 개선: 이미 Fetch Join으로 Note 정보를 가져옴)
-        List<GoalDetailResponseDto.MyTodoData> myTodoList = userTodos.stream()
+        List<GoalDetailResponseDto.MyTodoData> myTodoList = sortedTodos.stream()
                 .map(todo -> {
                     String noteContent = "";
                     if (todo.getNote() != null) {
@@ -97,6 +101,65 @@ public class GoalManageFacade {
         return teamProgress;
     }
 
+    private List<Todo> sortTodosByPriority(List<Todo> todos, String priorityOrder) {
+        if (priorityOrder == null || priorityOrder.isEmpty()) {
+            return sortTodosByNewPolicy(todos);
+        }
+
+        List<String> priorityIds = Arrays.asList(priorityOrder.split(","));
+        
+        return todos.stream()
+                .sorted((t1, t2) -> {
+                    int index1 = priorityIds.indexOf(t1.getId().toString());
+                    int index2 = priorityIds.indexOf(t2.getId().toString());
+                    
+                    if (index1 == -1 && index2 == -1) {
+                        // 둘 다 우선순위에 없으면 새로운 정책으로 정렬
+                        return sortTodosByNewPolicy(List.of(t1, t2)).get(0).getId().compareTo(sortTodosByNewPolicy(List.of(t1, t2)).get(1).getId());
+                    } else if (index1 == -1) {
+                        // t1이 우선순위에 없으면 뒤로
+                        return 1;
+                    } else if (index2 == -1) {
+                        // t2가 우선순위에 없으면 뒤로
+                        return -1;
+                    } else {
+                        // 둘 다 우선순위에 있으면 우선순위 오름차순 정렬
+                        return Integer.compare(index1, index2);
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 새로운 우선순위 정책에 따른 투두 정렬
+     * 1. createdAt이 있는 투두들을 createdAt 기준 오름차순 정렬
+     * 2. createdAt이 없는 투두들을 기존 priority 기준 내림차순 정렬
+     */
+    private List<Todo> sortTodosByNewPolicy(List<Todo> todos) {
+        return todos.stream()
+                .sorted((t1, t2) -> {
+                    // createdAt이 있는 투두들을 먼저 정렬
+                    boolean t1HasCreatedAt = t1.getCreatedAt() != null;
+                    boolean t2HasCreatedAt = t2.getCreatedAt() != null;
+                    
+                    if (t1HasCreatedAt && t2HasCreatedAt) {
+                        // 둘 다 createdAt이 있으면 createdAt 기준 오름차순
+                        return t1.getCreatedAt().compareTo(t2.getCreatedAt());
+                    } else if (t1HasCreatedAt && !t2HasCreatedAt) {
+                        // t1만 createdAt이 있으면 t1이 우선
+                        return -1;
+                    } else if (!t1HasCreatedAt && t2HasCreatedAt) {
+                        // t2만 createdAt이 있으면 t2가 우선
+                        return 1;
+                    } else {
+                        // 둘 다 createdAt이 없으면 기존 priority 기준 내림차순
+                        // 현재는 ID 기준으로 정렬 (나중에 priority 필드 추가 시 수정 필요)
+                        return Long.compare(t2.getId(), t1.getId());
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
 
 
     @Transactional
@@ -109,15 +172,16 @@ public class GoalManageFacade {
             throw new RuntimeException("우선순위 변경은 스터디장만 가능합니다.");
         }
         
-        // 우선순위 문자열 유효성 검증
-        validatePriorityOrder(requestDto.getPriorityOrder(), goalId);
+        // 새로운 정책에 맞게 우선순위 재정렬
+        List<Todo> allTodos = todoService.getTodosByGoalId(goalId);
+        String newPriorityOrder = calculateNewPriorityOrder(allTodos);
         
-        goalService.updatePriorityOrder(goalId, requestDto.getPriorityOrder());
+        goalService.updatePriorityOrder(goalId, newPriorityOrder);
         
         return GoalResponseDto.builder()
                 .id(goal.getId())
                 .title(goal.getTitle())
-                .priorityOrder(requestDto.getPriorityOrder())
+                .priorityOrder(newPriorityOrder)
                 .build();
     }
 
@@ -143,6 +207,38 @@ public class GoalManageFacade {
                 throw new RuntimeException("잘못된 투두 ID 형식입니다: " + todoIdStr);
             }
         }
+    }
+
+    /**
+     * 새로운 우선순위 정책에 따른 우선순위 문자열 생성
+     * 1. createdAt이 있는 투두들을 createdAt 기준 오름차순 정렬
+     * 2. createdAt이 없는 투두들을 기존 priority 기준 내림차순 정렬
+     */
+    private String calculateNewPriorityOrder(List<Todo> todos) {
+        // 1. createdAt이 있는 투두들을 createdAt 기준 오름차순 정렬
+        List<Todo> todosWithCreatedAt = todos.stream()
+                .filter(todo -> todo.getCreatedAt() != null)
+                .sorted(Comparator.comparing(Todo::getCreatedAt))
+                .collect(Collectors.toList());
+        
+        // 2. createdAt이 없는 투두들을 기존 priority 기준 내림차순 정렬
+        List<Todo> todosWithoutCreatedAt = todos.stream()
+                .filter(todo -> todo.getCreatedAt() == null)
+                .sorted((t1, t2) -> {
+                    // 기존 priority 기준 내림차순 정렬
+                    // 현재는 ID 기준으로 정렬 (나중에 priority 필드 추가 시 수정 필요)
+                    return Long.compare(t2.getId(), t1.getId());
+                })
+                .collect(Collectors.toList());
+        
+        // 3. 두 리스트를 합쳐서 우선순위 문자열 생성
+        List<Todo> sortedTodos = new ArrayList<>();
+        sortedTodos.addAll(todosWithCreatedAt);
+        sortedTodos.addAll(todosWithoutCreatedAt);
+        
+        return sortedTodos.stream()
+                .map(todo -> todo.getId().toString())
+                .collect(Collectors.joining(","));
     }
 
     @Transactional

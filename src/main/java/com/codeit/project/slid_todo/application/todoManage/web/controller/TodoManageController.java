@@ -69,29 +69,59 @@ public class TodoManageController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @GetMapping("/api/todos/{todoId}")
-    @Operation(summary = "투두 상세 조회", description = "특정 투두의 상세 정보를 조회합니다.")
-    public ResponseEntity<ResponseDto<TodoDetailResponseDto>> getTodoDetail(
+    @DeleteMapping("/api/todos/{todoId}")
+    @Operation(summary = "투두 삭제", description = "투두를 삭제합니다.")
+    public ResponseEntity<ResponseDto<Void>> deleteTodo(
             @Parameter(description = "투두 ID", example = "1") @PathVariable("todoId") Long todoId,
             @CurrentUser Long userId) {
 
-        TodoDetailResponseDto response = todoManageFacade.getTodoDetail(todoId, userId);
+        todoManageFacade.deleteTodo(todoId, userId);
 
-        ResponseDto<TodoDetailResponseDto> responseDto = ResponseDto.<TodoDetailResponseDto>builder()
+        ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
                 .httpStatusCode(HttpStatus.OK.value())
-                .data(response)
                 .build();
 
         return ResponseEntity.ok(responseDto);
     }
 
-    @GetMapping("/api/dashboard")
-    @Operation(summary = "대시보드 조회", description = "스터디의 대시보드 정보를 조회합니다.")
-    public ResponseEntity<ResponseDto<DashboardResponseDto>> getDashboard(
-            @Parameter(description = "스터디 ID", example = "1") @RequestParam("studyId") Long studyId,
+    @PatchMapping("/api/todos/{todoId}/complete")
+    @Operation(summary = "투두 완료", description = "투두를 완료 처리하고 우선순위를 재정렬합니다.")
+    public ResponseEntity<ResponseDto<Void>> completeTodo(
+            @Parameter(description = "투두 ID", example = "1") @PathVariable("todoId") Long todoId,
             @CurrentUser Long userId) {
 
-        DashboardResponseDto response = todoManageFacade.getDashboard(studyId, userId);
+        todoManageFacade.completeTodo(todoId, userId);
+
+        ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
+                .httpStatusCode(HttpStatus.OK.value())
+                .build();
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+//    @GetMapping("/api/todos/{todoId}")
+//    @Operation(summary = "투두 상세 조회", description = "특정 투두의 상세 정보를 조회합니다.")
+//    public ResponseEntity<ResponseDto<TodoDetailResponseDto>> getTodoDetail(
+//            @Parameter(description = "투두 ID", example = "1") @PathVariable("todoId") Long todoId,
+//            @CurrentUser Long userId) {
+//
+//        TodoDetailResponseDto response = todoManageFacade.getTodoDetail(todoId, userId);
+//
+//        ResponseDto<TodoDetailResponseDto> responseDto = ResponseDto.<TodoDetailResponseDto>builder()
+//                .httpStatusCode(HttpStatus.OK.value())
+//                .data(response)
+//                .build();
+//
+//        return ResponseEntity.ok(responseDto);
+//    }
+
+    @GetMapping("/api/dashboard")
+    @Operation(summary = "대시보드 조회", description = "목표의 대시보드 정보를 조회합니다.")
+    public ResponseEntity<ResponseDto<DashboardResponseDto>> getDashboard(
+            @Parameter(description = "목표 ID", example = "1") @RequestParam("goalId") Long goalId,
+            @CurrentUser Long userId) {
+
+        DashboardResponseDto response = todoManageFacade.getDashboard(goalId, userId);
 
         ResponseDto<DashboardResponseDto> responseDto = ResponseDto.<DashboardResponseDto>builder()
                 .httpStatusCode(HttpStatus.OK.value())
