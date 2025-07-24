@@ -53,9 +53,9 @@ public class StudyManageFacade {
     }
 
     @Transactional
-    public void joinStudy(JoinStudyDto.Request joinStudyDto, Long studyId, Long userId) {
-        Study study = studyService.getStudyIfInviteCodeMatches(studyId, joinStudyDto.inviteCode());
-        studyUserService.validateNotJoined(studyId, userId);
+    public void joinStudy(JoinStudyDto.Request joinStudyDto, Long userId) {
+        Study study = studyService.findByInviteCode(joinStudyDto.inviteCode());
+        studyUserService.validateNotJoined(study.getId(), userId);
 
         User user = userService.findUserById(userId);
         studyUserService.saveTeamMember(user, study);

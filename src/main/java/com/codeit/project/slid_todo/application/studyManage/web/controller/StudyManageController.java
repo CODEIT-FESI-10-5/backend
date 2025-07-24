@@ -8,7 +8,10 @@ import com.codeit.project.slid_todo.common.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +19,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
+@Slf4j
 @Tag(name = "Study Management", description = "스터디 관리 API")
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class StudyManageController {
 
     private final StudyManageFacade studyManageFacade;
@@ -73,15 +78,15 @@ public class StudyManageController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/api/study/{studyId}/join")
+    @PostMapping("/api/study/join")
     @Operation(summary = "스터디 참가", description = "초대 코드를 이용하여 스터디에 참여합니다.")
     public ResponseEntity<ResponseDto<Void>> joinStudy(
-            @Parameter(description = "스터디 ID") @PathVariable Long studyId,
-            @RequestBody JoinStudyDto.Request joinStudyDto,
+            @Valid @RequestBody JoinStudyDto.Request joinStudyDto,
             @Parameter(hidden = true) @CurrentUser Long userId
     ) {
 
-        studyManageFacade.joinStudy(joinStudyDto, studyId, userId);
+        log.info("inviteCode={}",joinStudyDto.inviteCode());
+        studyManageFacade.joinStudy(joinStudyDto, userId);
 
         ResponseDto<Void> response = ResponseDto.<Void>builder()
                 .httpStatusCode(HttpStatus.OK.value())
