@@ -83,7 +83,7 @@ public class StudyManageController {
             @Parameter(hidden = true) @CurrentUser Long userId
     ) {
 
-        studyManageFacade.joinStudy(joinStudyDto, studyId, userId);
+        studyManageFacade.joinStudy(joinStudyDto, userId);
 
         ResponseDto<Void> response = ResponseDto.<Void>builder()
                 .httpStatusCode(HttpStatus.OK.value())
