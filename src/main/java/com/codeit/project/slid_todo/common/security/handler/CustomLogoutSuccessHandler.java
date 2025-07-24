@@ -41,6 +41,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
         }
 
         refreshTokenService.delete(refreshToken);
+        response.addCookie(cookieUtils.createDeleteCookie("accessToken"));
         response.addCookie(cookieUtils.createDeleteCookie("refreshToken"));
     }
 }

@@ -36,17 +36,17 @@ public class AuthController {
         return ResponseEntity.status(response.getHttpStatusCode()).body(response);
     }
 
-    @PostMapping("/api/auth/login")
-    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인합니다.")
-    public ResponseEntity<ResponseDto<LoginResponseDto>> login(
-            @Valid @RequestBody LoginRequestDto requestDto) {
-        LoginResponseDto response = authFacade.login(requestDto);
-        ResponseDto<LoginResponseDto> responseDto = ResponseDto.<LoginResponseDto>builder()
-                .httpStatusCode(HttpStatus.OK.value())
-                .data(response)
-                .build();
-        return ResponseEntity.ok(responseDto);
-    }
+//    @PostMapping("/api/auth/login")
+//    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인합니다.")
+//    public ResponseEntity<ResponseDto<LoginResponseDto>> login(
+//            @Valid @RequestBody LoginRequestDto requestDto) {
+//        LoginResponseDto response = authFacade.login(requestDto);
+//        ResponseDto<LoginResponseDto> responseDto = ResponseDto.<LoginResponseDto>builder()
+//                .httpStatusCode(HttpStatus.OK.value())
+//                .data(response)
+//                .build();
+//        return ResponseEntity.ok(responseDto);
+//    }
 
     @PostMapping("/api/auth/reissue")
     @Operation(summary = "토큰 재발급", description = "Access Token이 만료되었을 때 Refresh Token으로 재발급합니다.")
