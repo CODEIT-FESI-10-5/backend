@@ -7,11 +7,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class CookieUtils {
 
-    public Cookie createCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24 * 60 * 60);
+    public Cookie createAccessTokenCookie(String token) {
+        Cookie cookie = new Cookie("accessToken", token);
+        cookie.setMaxAge(1800);
         cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setAttribute("SameSite", "None");
+        return cookie;
+    }
 
+    public Cookie createRefreshTokenCookie(String token) {
+        Cookie cookie = new Cookie("refreshToken", token);
+        cookie.setMaxAge(604800);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setAttribute("SameSite", "None");
         return cookie;
     }
 
@@ -23,11 +35,19 @@ public class CookieUtils {
         return cookie;
     }
 
+     public String extractAccessToken(HttpServletRequest request) {
+        return extractCookieValue(request, "accessToken");
+    }
+
     public String extractRefreshToken(HttpServletRequest request) {
+        return extractCookieValue(request, "refreshToken");
+    }
+
+    private String extractCookieValue(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("refreshToken".equals(cookie.getName())) {
+                if (name.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }

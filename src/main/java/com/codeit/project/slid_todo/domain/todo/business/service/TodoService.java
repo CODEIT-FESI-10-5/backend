@@ -102,4 +102,16 @@ public class TodoService {
     public long countByStudy(Long studyId) {
         return todoRepository.countByStudy(studyId);
     }
+
+    public List<Todo> getRecentCompletedTodosByGoalIdAndUserId(Long goalId, Long userId) {
+        return todoRepository.findRecentCompletedTodosByGoalIdAndUserId(goalId, userId);
+    }
+
+    public List<Todo> getInProgressTodosByGoalIdAndUserId(Long goalId, Long userId) {
+        return todoRepository.findInProgressTodosByGoalIdAndUserId(goalId, userId);
+    }
+
+    public List<Todo> getTodosByGoalId(Long goalId) {
+        return todoRepository.findByGoalId(goalId);
+    }
 } 

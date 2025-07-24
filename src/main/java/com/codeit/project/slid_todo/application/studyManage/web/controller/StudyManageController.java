@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
-@Slf4j
 @Tag(name = "Study Management", description = "스터디 관리 API")
 @RestController
 @RequiredArgsConstructor
@@ -85,8 +83,7 @@ public class StudyManageController {
             @Parameter(hidden = true) @CurrentUser Long userId
     ) {
 
-        log.info("inviteCode={}",joinStudyDto.inviteCode());
-        studyManageFacade.joinStudy(joinStudyDto, userId);
+        studyManageFacade.joinStudy(joinStudyDto, studyId, userId);
 
         ResponseDto<Void> response = ResponseDto.<Void>builder()
                 .httpStatusCode(HttpStatus.OK.value())

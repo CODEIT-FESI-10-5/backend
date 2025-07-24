@@ -1,5 +1,7 @@
 package com.codeit.project.slid_todo.application.auth.business;
 
+import com.codeit.project.slid_todo.application.auth.web.dto.LoginRequestDto;
+import com.codeit.project.slid_todo.application.auth.web.dto.LoginResponseDto;
 import com.codeit.project.slid_todo.application.auth.web.dto.SignupDto;
 import com.codeit.project.slid_todo.common.security.dto.RefreshTokenDto;
 import com.codeit.project.slid_todo.common.security.errorCode.AuthErrorCode;
@@ -16,12 +18,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -32,6 +37,7 @@ public class AuthFacade {
     private final JwtProperties jwtProperties;
     private final JwtProvider jwtProvider;
     private final CookieUtils cookieUtils;
+    private final PasswordEncoder passwordEncoder;
 
     public void registerUser(SignupDto.Request requestDto) {
         userService.registerUser(
@@ -40,6 +46,32 @@ public class AuthFacade {
                 requestDto.password()
         );
     }
+
+//    public LoginResponseDto login(LoginRequestDto requestDto) {
+//        User user = userService.findByEmail(requestDto.email());
+//
+//        // 비밀번호 검증
+//        if (!passwordEncoder.matches(requestDto.password(), user.getPassword())) {
+//            throw new RuntimeException("아이디 또는 비밀번호가 올바르지 않습니다.");
+//        }
+//
+//        // JWT 토큰 생성
+//        String accessToken = jwtProvider.generateAccessToken(user.getEmail(), user.getId());
+//        String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
+//        Date refreshTokenExpiry = jwtProvider.getClaims(refreshToken).getExpiration();
+//
+//        // Refresh Token 저장
+//        refreshTokenService.registerRefreshToken(user, refreshToken, refreshTokenExpiry);
+//
+//        return LoginResponseDto.builder()
+//                .userId(user.getId())
+//                .name(user.getName())
+//                .email(user.getEmail())
+//                .nickname(user.getNickname())
+//                .accessToken(accessToken)
+//                .refreshToken(refreshToken)
+//                .build();
+//    }
 
     public void registerRefreshToken(RefreshTokenDto refreshTokenDto) {
         User user = userService.findUserById(refreshTokenDto.userId());
@@ -56,16 +88,20 @@ public class AuthFacade {
 
             User user = validRefreshTokenSubject(preRefresh);
 
-            String newRefresh = generateRefreshToken(preRefresh);
+            String newRefresh = generateRefreshToken(user.getEmail());
             String newAccess = getAccessToken(user);
+
+            log.info("newRefresh={}", newRefresh);
 
             updateRefreshToken(newRefresh, preRefresh, user);
 
             response.setCharacterEncoding("utf-8");
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_OK);
-            response.addHeader(HttpHeaders.AUTHORIZATION, jwtProperties.getTokenPrefix() + newAccess);
-            response.addCookie(cookieUtils.createCookie("refreshToken", newRefresh));
+//            response.addHeader(HttpHeaders.AUTHORIZATION, jwtProperties.getTokenPrefix() + newAccess);
+//            response.addCookie(cookieUtils.createCookie("refreshToken", newRefresh));
+            response.addCookie(cookieUtils.createAccessTokenCookie(newAccess));
+            response.addCookie(cookieUtils.createRefreshTokenCookie(newRefresh));
         } catch (ExpiredJwtException ee) {
             request.setAttribute("errorCode", AuthErrorCode.ACCESS_TOKEN_EXPIRED);
         } catch (SignatureException se) {
@@ -87,8 +123,8 @@ public class AuthFacade {
         );
     }
 
-    private String generateRefreshToken(String refreshToken) {
-        return jwtProvider.generateRefreshToken(refreshToken);
+    private String generateRefreshToken(String subject) {
+        return jwtProvider.generateRefreshToken(subject);
     }
 
     private User validRefreshTokenSubject(String refreshToken) {

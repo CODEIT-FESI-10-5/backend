@@ -1,6 +1,8 @@
 package com.codeit.project.slid_todo.application.auth.web.controller;
 
 import com.codeit.project.slid_todo.application.auth.business.AuthFacade;
+import com.codeit.project.slid_todo.application.auth.web.dto.LoginRequestDto;
+import com.codeit.project.slid_todo.application.auth.web.dto.LoginResponseDto;
 import com.codeit.project.slid_todo.application.auth.web.dto.SignupDto;
 import com.codeit.project.slid_todo.common.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,9 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Authentication", description = "회원가입 및 토큰 재발급 API")
 @RestController
@@ -35,6 +35,18 @@ public class AuthController {
 
         return ResponseEntity.status(response.getHttpStatusCode()).body(response);
     }
+
+//    @PostMapping("/api/auth/login")
+//    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인합니다.")
+//    public ResponseEntity<ResponseDto<LoginResponseDto>> login(
+//            @Valid @RequestBody LoginRequestDto requestDto) {
+//        LoginResponseDto response = authFacade.login(requestDto);
+//        ResponseDto<LoginResponseDto> responseDto = ResponseDto.<LoginResponseDto>builder()
+//                .httpStatusCode(HttpStatus.OK.value())
+//                .data(response)
+//                .build();
+//        return ResponseEntity.ok(responseDto);
+//    }
 
     @PostMapping("/api/auth/reissue")
     @Operation(summary = "토큰 재발급", description = "Access Token이 만료되었을 때 Refresh Token으로 재발급합니다.")

@@ -7,6 +7,7 @@ import com.codeit.project.slid_todo.common.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Todo Management", description = "투두 리스트 관리 API")
+@SecurityRequirement(name = "bearerAuth")
 public class TodoManageController {
 
     private final TodoManageFacade todoManageFacade;
@@ -62,6 +64,38 @@ public class TodoManageController {
 
         ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
                 .httpStatusCode(HttpStatus.OK.value())
+                .build();
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @GetMapping("/api/todos/{todoId}")
+    @Operation(summary = "투두 상세 조회", description = "특정 투두의 상세 정보를 조회합니다.")
+    public ResponseEntity<ResponseDto<TodoDetailResponseDto>> getTodoDetail(
+            @Parameter(description = "투두 ID", example = "1") @PathVariable("todoId") Long todoId,
+            @CurrentUser Long userId) {
+
+        TodoDetailResponseDto response = todoManageFacade.getTodoDetail(todoId, userId);
+
+        ResponseDto<TodoDetailResponseDto> responseDto = ResponseDto.<TodoDetailResponseDto>builder()
+                .httpStatusCode(HttpStatus.OK.value())
+                .data(response)
+                .build();
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @GetMapping("/api/dashboard")
+    @Operation(summary = "대시보드 조회", description = "스터디의 대시보드 정보를 조회합니다.")
+    public ResponseEntity<ResponseDto<DashboardResponseDto>> getDashboard(
+            @Parameter(description = "스터디 ID", example = "1") @RequestParam("studyId") Long studyId,
+            @CurrentUser Long userId) {
+
+        DashboardResponseDto response = todoManageFacade.getDashboard(studyId, userId);
+
+        ResponseDto<DashboardResponseDto> responseDto = ResponseDto.<DashboardResponseDto>builder()
+                .httpStatusCode(HttpStatus.OK.value())
+                .data(response)
                 .build();
 
         return ResponseEntity.ok(responseDto);

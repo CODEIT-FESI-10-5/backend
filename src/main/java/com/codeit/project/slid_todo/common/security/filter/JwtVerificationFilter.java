@@ -4,6 +4,7 @@ import com.codeit.project.slid_todo.common.security.errorCode.AuthErrorCode;
 import com.codeit.project.slid_todo.common.security.jwt.JwtProperties;
 import com.codeit.project.slid_todo.common.security.jwt.JwtProvider;
 import com.codeit.project.slid_todo.common.security.vo.CustomUserDetails;
+import com.codeit.project.slid_todo.common.util.CookieUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -27,6 +28,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final JwtProperties jwtProperties;
+    private final CookieUtils cookieUtils;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -48,8 +50,9 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
     }
 
     private boolean validAuthorizationHeader(HttpServletRequest request) {
-        String authorizationHeader = getAuthenticationTokenToHeader(request);
-        return authorizationHeader != null && authorizationHeader.startsWith(jwtProperties.getTokenPrefix());
+        String authorizationHeader = getAuthenticationTokenToCookie(request);
+//        return authorizationHeader != null && authorizationHeader.startsWith(jwtProperties.getTokenPrefix());
+        return authorizationHeader != null;
     }
 
     private void setAuthenticationToContext(HttpServletRequest request) {
@@ -62,12 +65,13 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
     }
 
     private CustomUserDetails createUserDetails(HttpServletRequest request) {
-        String token = getAuthenticationTokenToHeader(request).substring(jwtProperties.getTokenPrefix().length());
+//        String token = getAuthenticationTokenToCookie(request).substring(jwtProperties.getTokenPrefix().length());
+        String token = getAuthenticationTokenToCookie(request);
         return new CustomUserDetails(jwtProvider.getClaims(token));
     }
 
-    private String getAuthenticationTokenToHeader(HttpServletRequest request) {
-        return request.getHeader(HttpHeaders.AUTHORIZATION);
+    private String getAuthenticationTokenToCookie(HttpServletRequest request) {
+        return cookieUtils.extractAccessToken(request);
     }
 
 }

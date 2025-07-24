@@ -6,6 +6,7 @@ import com.codeit.project.slid_todo.common.annotation.CurrentUser;
 import com.codeit.project.slid_todo.common.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.io.IOException;
 @Tag(name = "User Management", description = "유저 관리 API")
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class UserManageController {
 
     private final UserManageFacade userManageFacade;
