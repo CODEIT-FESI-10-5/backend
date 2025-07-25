@@ -1,5 +1,6 @@
 package com.codeit.project.slid_todo.application.studyManage.web.dto;
 
+import com.codeit.project.slid_todo.domain.study.persistent.entity.Study;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -14,7 +15,11 @@ public record JoinStudyDto() {
 
     }
 
-    public record Response() {
-
+    public record Response(
+            Long studyId
+    ) {
+        public static JoinStudyDto.Response from(Study study) {
+            return new JoinStudyDto.Response(study.getId());
+        }
     }
 }

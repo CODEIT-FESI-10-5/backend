@@ -79,15 +79,16 @@ public class StudyManageController {
 
     @PostMapping("/api/study/join")
     @Operation(summary = "스터디 참가", description = "초대 코드를 이용하여 스터디에 참여합니다.")
-    public ResponseEntity<ResponseDto<Void>> joinStudy(
+    public ResponseEntity<ResponseDto<JoinStudyDto.Response>> joinStudy(
             @Valid @RequestBody JoinStudyDto.Request joinStudyDto,
             @Parameter(hidden = true) @CurrentUser Long userId
     ) {
 
-        studyManageFacade.joinStudy(joinStudyDto, userId);
+        JoinStudyDto.Response responseData = studyManageFacade.joinStudy(joinStudyDto, userId);
 
-        ResponseDto<Void> response = ResponseDto.<Void>builder()
+        ResponseDto<JoinStudyDto.Response> response = ResponseDto.<JoinStudyDto.Response>builder()
                 .httpStatusCode(HttpStatus.OK.value())
+                .data(responseData)
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
