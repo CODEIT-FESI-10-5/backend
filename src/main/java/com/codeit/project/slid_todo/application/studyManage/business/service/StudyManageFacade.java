@@ -31,10 +31,11 @@ public class StudyManageFacade {
     private final ImgStore imgStore;
 
     @Transactional
-    public void createStudy(Long userId) {
+    public CreateStudyDto.Response createStudy(Long userId) {
         User user = userService.findUserById(userId);
         Study study = studyService.createStudy(user);
         studyUserService.saveLeader(user, study);
+        return CreateStudyDto.Response.from(study);
     }
 
     @Transactional
