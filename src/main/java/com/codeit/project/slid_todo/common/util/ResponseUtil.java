@@ -17,15 +17,15 @@ public class ResponseUtil {
     private final ObjectMapper objectMapper;
 
     public void writeJsonResponse(HttpServletResponse response, ResponseDto<Void> body) throws IOException {
-        setDefaultJsonResponseHeader(response);
+        setDefaultJsonResponseHeader(response, body);
         try (OutputStream out = response.getOutputStream()) {
             objectMapper.writeValue(out, body);
         }
     }
 
-    public void setDefaultJsonResponseHeader(HttpServletResponse response) {
+    public void setDefaultJsonResponseHeader(HttpServletResponse response, ResponseDto<Void> body) {
         response.setCharacterEncoding("utf-8");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpServletResponse.SC_OK);
+        response.setStatus(body.getHttpStatusCode());
     }
 }
