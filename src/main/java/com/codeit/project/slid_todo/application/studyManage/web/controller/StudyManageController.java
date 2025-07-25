@@ -28,13 +28,14 @@ public class StudyManageController {
 
     @PostMapping("/api/study")
     @Operation(summary = "스터디 생성", description = "새로운 스터디를 생성합니다.")
-    public ResponseEntity<ResponseDto<Void>> createStudy(
+    public ResponseEntity<ResponseDto<CreateStudyDto.Response>> createStudy(
             @Parameter(hidden = true) @CurrentUser Long userId) {
 
-        studyManageFacade.createStudy(userId);
+        CreateStudyDto.Response responseData = studyManageFacade.createStudy(userId);
 
-        ResponseDto<Void> response = ResponseDto.<Void>builder()
+        ResponseDto<CreateStudyDto.Response> response = ResponseDto.<CreateStudyDto.Response>builder()
                 .httpStatusCode(HttpStatus.CREATED.value())
+                .data(responseData)
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
