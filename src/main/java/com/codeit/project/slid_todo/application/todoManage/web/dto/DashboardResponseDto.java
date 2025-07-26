@@ -67,6 +67,9 @@ public class DashboardResponseDto {
         
         @Schema(description = "공유 투두 여부", example = "false")
         private boolean shared;
+        
+        @Schema(description = "우선순위", example = "1")
+        private Integer priorityOrder;
     }
 
     @Getter

@@ -21,18 +21,14 @@ public class Note extends BaseDateTime {
     @JoinColumn(name = "todo_id")
     private Todo todo;
 
-    @Column(nullable = false)
-    private String title;
-
     @Column(columnDefinition = "TEXT")
     private String content;
 
     private boolean isDeleted = false;
 
     @Builder
-    public Note(Todo todo, String title, String content) {
+    public Note(Todo todo, String content) {
         addTodo(todo);
-        this.title = title;
         this.content = content;
     }
 
@@ -41,10 +37,6 @@ public class Note extends BaseDateTime {
             this.todo = todo;
             todo.setNote(this);
         }
-    }
-
-    public void updateTitle(String title) {
-        this.title = title;
     }
 
     public void updateContent(String content) {

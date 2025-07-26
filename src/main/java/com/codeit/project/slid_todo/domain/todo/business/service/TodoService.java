@@ -8,6 +8,8 @@ import com.codeit.project.slid_todo.domain.studyUser.persistent.repository.Domai
 import com.codeit.project.slid_todo.domain.todo.errorCode.TodoErrorCode;
 import com.codeit.project.slid_todo.domain.todo.persistent.entity.Todo;
 import com.codeit.project.slid_todo.domain.todo.persistent.repository.DomainTodoRepository;
+import com.codeit.project.slid_todo.domain.note.persistent.entity.Note;
+import com.codeit.project.slid_todo.domain.note.persistent.repository.DomainNoteRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class TodoService {
     private final DomainTodoRepository todoRepository;
     private final DomainGoalRepository goalRepository;
     private final DomainStudyUserRepository studyUserRepository;
+    private final DomainNoteRepository noteRepository;
 
     private static final int MAX_TODOS_PER_GOAL = 10; // 투두 최대 개수 제한
 
@@ -30,20 +33,32 @@ public class TodoService {
         Goal goal = goalRepository.getByIdOrThrow(goalId);
         StudyUser assignedUser = studyUserRepository.getByIdOrThrow(assignedUserId);
         
-        // 투두 개수 제한 확인
-        long currentTodoCount = todoRepository.countByGoalId(goalId);
+        // 사용자별 투두 개수 제한 확인
+        long currentTodoCount = todoRepository.countByGoalIdAndUserIdAndNotDeleted(goalId, assignedUser.getUser().getId());
         if (currentTodoCount >= MAX_TODOS_PER_GOAL) {
             throw new BaseException(TodoErrorCode.TODO_LIMIT_EXCEEDED);
         }
+
+        // 새로운 우선순위 계산 (사용자별 최대값 + 1)
+        Integer newPriorityOrder = calculateNewPriorityOrderByUserId(goalId, assignedUser.getUser().getId());
 
         Todo todo = Todo.builder()
                 .goal(goal)
                 .assignedUser(assignedUser)
                 .content(content)
                 .shared(shared)
+                .priorityOrder(newPriorityOrder)
                 .build();
 
         todoRepository.save(todo);
+        
+        // 투두 생성 시 빈 노트도 함께 생성
+        Note note = Note.builder()
+                .todo(todo)
+                .content("")
+                .build();
+        noteRepository.save(note);
+        
         return todo;
     }
 
@@ -54,14 +69,32 @@ public class TodoService {
         List<Todo> createdTodos = new ArrayList<>();
         
         for (StudyUser studyUser : studyUsers) {
+            // 각 사용자별로 개수 제한 확인
+            long currentTodoCount = todoRepository.countByGoalIdAndUserIdAndNotDeleted(goalId, studyUser.getUser().getId());
+            if (currentTodoCount >= MAX_TODOS_PER_GOAL) {
+                throw new BaseException(TodoErrorCode.TODO_LIMIT_EXCEEDED);
+            }
+            
+            // 각 사용자별로 새로운 우선순위 계산
+            Integer newPriorityOrder = calculateNewPriorityOrderByUserId(goalId, studyUser.getUser().getId());
+            
             Todo todo = Todo.builder()
                     .goal(goal)
                     .assignedUser(studyUser)
                     .content(content)
                     .shared(true)
+                    .priorityOrder(newPriorityOrder)
                     .build();
             
             todoRepository.save(todo);
+            
+            // 공통 투두 생성 시에도 빈 노트 함께 생성
+            Note note = Note.builder()
+                    .todo(todo)
+                    .content("")
+                    .build();
+            noteRepository.save(note);
+            
             createdTodos.add(todo);
         }
         
@@ -117,5 +150,50 @@ public class TodoService {
 
     public void save(Todo todo) {
         todoRepository.save(todo);
+    }
+
+    public void updateTodoPriority(Long todoId, Integer newPriorityOrder) {
+        Todo todo = todoRepository.getByIdOrThrow(todoId);
+        Long goalId = todo.getGoal().getId();
+        Long userId = todo.getAssignedUser().getUser().getId();
+        
+        // 우선순위 변경 시 같은 사용자의 다른 투두들의 우선순위 조정
+        adjustPriorityOrdersByUserId(goalId, userId, newPriorityOrder);
+        
+        // 해당 투두의 우선순위 업데이트
+        todo.updatePriorityOrder(newPriorityOrder);
+        todoRepository.save(todo);
+    }
+
+    private Integer calculateNewPriorityOrder(Long goalId) {
+        Integer maxPriorityOrder = todoRepository.findMaxPriorityOrderByGoalId(goalId);
+        return maxPriorityOrder == null ? 1 : maxPriorityOrder + 1;
+    }
+
+    private Integer calculateNewPriorityOrderByUserId(Long goalId, Long userId) {
+        Integer maxPriorityOrder = todoRepository.findMaxPriorityOrderByGoalIdAndUserId(goalId, userId);
+        return maxPriorityOrder == null ? 1 : maxPriorityOrder + 1;
+    }
+
+    private void adjustPriorityOrders(Long goalId, Integer newPriorityOrder) {
+        // 새로운 우선순위 이상인 투두들을 조회
+        List<Todo> todosToAdjust = todoRepository.findByGoalIdAndPriorityOrderGreaterThanEqual(goalId, newPriorityOrder);
+        
+        // 우선순위를 하나씩 증가
+        for (Todo todo : todosToAdjust) {
+            todo.updatePriorityOrder(todo.getPriorityOrder() + 1);
+            todoRepository.save(todo);
+        }
+    }
+
+    private void adjustPriorityOrdersByUserId(Long goalId, Long userId, Integer newPriorityOrder) {
+        // 같은 사용자의 새로운 우선순위 이상인 투두들을 조회
+        List<Todo> todosToAdjust = todoRepository.findByGoalIdAndUserIdAndPriorityOrderGreaterThanEqual(goalId, userId, newPriorityOrder);
+        
+        // 우선순위를 하나씩 증가
+        for (Todo todo : todosToAdjust) {
+            todo.updatePriorityOrder(todo.getPriorityOrder() + 1);
+            todoRepository.save(todo);
+        }
     }
 } 

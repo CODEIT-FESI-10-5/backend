@@ -18,23 +18,7 @@ public class NoteService {
     private final DomainNoteRepository noteRepository;
     private final DomainTodoRepository todoRepository;
 
-    public Note createNote(Long todoId, String title, String content) {
-        Todo todo = todoRepository.getByIdOrThrow(todoId);
-        
-        // 이미 노트가 존재하는지 확인
-        if (noteRepository.existsByTodoId(todoId)) {
-            throw new BaseException(NoteErrorCode.NOTE_ALREADY_EXISTS);
-        }
 
-        Note note = Note.builder()
-                .todo(todo)
-                .title(title)
-                .content(content)
-                .build();
-
-        noteRepository.save(note);
-        return note;
-    }
 
     public Note getNoteById(Long noteId) {
         return noteRepository.getByIdOrThrow(noteId);
@@ -44,9 +28,8 @@ public class NoteService {
         return noteRepository.findByTodoIdOrThrow(todoId);
     }
 
-    public void updateNote(Long noteId, String title, String content) {
+    public void updateNote(Long noteId, String content) {
         Note note = noteRepository.getByIdOrThrow(noteId);
-        note.updateTitle(title);
         note.updateContent(content);
         noteRepository.save(note);
     }

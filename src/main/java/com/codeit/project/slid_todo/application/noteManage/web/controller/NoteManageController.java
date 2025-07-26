@@ -1,7 +1,10 @@
 package com.codeit.project.slid_todo.application.noteManage.web.controller;
 
 import com.codeit.project.slid_todo.application.noteManage.business.service.NoteManageFacade;
-import com.codeit.project.slid_todo.application.noteManage.web.dto.*;
+import com.codeit.project.slid_todo.application.noteManage.web.dto.NoteListRequestDto;
+import com.codeit.project.slid_todo.application.noteManage.web.dto.NoteListResponseDto;
+import com.codeit.project.slid_todo.application.noteManage.web.dto.NoteDetailResponseDto;
+import com.codeit.project.slid_todo.application.noteManage.web.dto.UpdateNoteRequestDto;
 import com.codeit.project.slid_todo.common.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -50,20 +53,7 @@ public class NoteManageController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @PostMapping("/api/notes")
-    @Operation(summary = "노트 생성", description = "투두에 새로운 노트를 생성합니다.")
-    public ResponseEntity<ResponseDto<NoteDetailResponseDto>> createNote(
-            @Valid @RequestBody CreateNoteRequestDto requestDto) {
 
-        NoteDetailResponseDto response = noteManageFacade.createNote(requestDto.getTodoId(), requestDto);
-
-        ResponseDto<NoteDetailResponseDto> responseDto = ResponseDto.<NoteDetailResponseDto>builder()
-                .httpStatusCode(HttpStatus.CREATED.value())
-                .data(response)
-                .build();
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
-    }
 
     @PatchMapping("/api/notes/{noteId}")
     @Operation(summary = "노트 수정", description = "기존 노트의 제목과 내용을 수정합니다.")

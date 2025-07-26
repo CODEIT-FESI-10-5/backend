@@ -1,7 +1,12 @@
 package com.codeit.project.slid_todo.application.todoManage.web.controller;
 
 import com.codeit.project.slid_todo.application.todoManage.business.service.TodoManageFacade;
-import com.codeit.project.slid_todo.application.todoManage.web.dto.*;
+import com.codeit.project.slid_todo.application.todoManage.web.dto.CreateTodoRequestDto;
+import com.codeit.project.slid_todo.application.todoManage.web.dto.DashboardResponseDto;
+import com.codeit.project.slid_todo.application.todoManage.web.dto.TodoDetailResponseDto;
+import com.codeit.project.slid_todo.application.todoManage.web.dto.TodoListResponseDto;
+import com.codeit.project.slid_todo.application.todoManage.web.dto.UpdateTodoPriorityRequestDto;
+import com.codeit.project.slid_todo.application.todoManage.web.dto.UpdateTodoRequestDto;
 import com.codeit.project.slid_todo.common.annotation.CurrentUser;
 import com.codeit.project.slid_todo.common.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -126,6 +131,21 @@ public class TodoManageController {
         ResponseDto<DashboardResponseDto> responseDto = ResponseDto.<DashboardResponseDto>builder()
                 .httpStatusCode(HttpStatus.OK.value())
                 .data(response)
+                .build();
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @PatchMapping("/api/todos/priority")
+    @Operation(summary = "투두 우선순위 수정", description = "자신의 투두 우선순위를 수정합니다.")
+    public ResponseEntity<ResponseDto<Void>> updateTodoPriority(
+            @CurrentUser Long userId,
+            @Valid @RequestBody UpdateTodoPriorityRequestDto requestDto) {
+
+        todoManageFacade.updateTodoPriority(userId, requestDto);
+
+        ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
+                .httpStatusCode(HttpStatus.OK.value())
                 .build();
 
         return ResponseEntity.ok(responseDto);

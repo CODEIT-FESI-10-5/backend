@@ -34,7 +34,6 @@ public class GoalService {
         Goal goal = Goal.builder()
                 .study(study)
                 .title(title)
-                .priorityOrder("") // 초기에는 빈 문자열
                 .build();
 
         goalRepository.save(goal);
@@ -52,12 +51,6 @@ public class GoalService {
     public void updateGoalTitle(Long goalId, String title) {
         Goal goal = goalRepository.getByIdOrThrow(goalId);
         goal.updateTitle(title);
-        goalRepository.save(goal);
-    }
-
-    public void updatePriorityOrder(Long goalId, String priorityOrder) {
-        Goal goal = goalRepository.getByIdOrThrow(goalId);
-        goal.updatePriorityOrder(priorityOrder);
         goalRepository.save(goal);
     }
 

@@ -32,6 +32,9 @@ public class Todo extends BaseDateTime {
     @Column(nullable = false)
     private String content;
 
+    @Column(name = "priority_order")
+    private Integer priorityOrder;
+
     private boolean completed = false;
 
     @Column(name = "completed_at")
@@ -45,11 +48,12 @@ public class Todo extends BaseDateTime {
     private Note note;
 
     @Builder
-    public Todo(Goal goal, StudyUser assignedUser, String content, boolean shared) {
+    public Todo(Goal goal, StudyUser assignedUser, String content, boolean shared, Integer priorityOrder) {
         addGoal(goal);
         addAssignedUser(assignedUser);
         this.content = content;
         this.shared = shared;
+        this.priorityOrder = priorityOrder;
     }
 
     private void addGoal(Goal goal) {
@@ -68,6 +72,10 @@ public class Todo extends BaseDateTime {
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public void updatePriorityOrder(Integer priorityOrder) {
+        this.priorityOrder = priorityOrder;
     }
 
     public void toggleComplete() {

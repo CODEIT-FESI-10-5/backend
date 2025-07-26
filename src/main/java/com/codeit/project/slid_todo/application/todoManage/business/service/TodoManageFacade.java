@@ -1,6 +1,11 @@
 package com.codeit.project.slid_todo.application.todoManage.business.service;
 
-import com.codeit.project.slid_todo.application.todoManage.web.dto.*;
+import com.codeit.project.slid_todo.application.todoManage.web.dto.CreateTodoRequestDto;
+import com.codeit.project.slid_todo.application.todoManage.web.dto.DashboardResponseDto;
+import com.codeit.project.slid_todo.application.todoManage.web.dto.TodoDetailResponseDto;
+import com.codeit.project.slid_todo.application.todoManage.web.dto.TodoListResponseDto;
+import com.codeit.project.slid_todo.application.todoManage.web.dto.UpdateTodoPriorityRequestDto;
+import com.codeit.project.slid_todo.application.todoManage.web.dto.UpdateTodoRequestDto;
 import com.codeit.project.slid_todo.domain.goal.business.service.GoalService;
 import com.codeit.project.slid_todo.domain.goal.persistent.entity.Goal;
 import com.codeit.project.slid_todo.domain.note.business.service.NoteService;
@@ -14,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,8 +38,8 @@ public class TodoManageFacade {
         // 사용자의 투두 목록 조회 (우선순위 순서대로)
         List<Todo> userTodos = todoService.getTodosByGoalIdAndUserId(goalId, userId);
 
-        // 우선순위 순서대로 정렬
-        List<Todo> sortedTodos = sortTodosByPriority(userTodos, goal.getPriorityOrder());
+        // 쿼리에서 이미 정렬된 투두 목록 사용
+        List<Todo> sortedTodos = userTodos;
 
         // 투두 데이터 생성 (N+1 문제 개선: 이미 Fetch Join으로 Note 정보를 가져옴)
         List<TodoListResponseDto.TodoData> myTodoList = sortedTodos.stream()
@@ -55,79 +60,19 @@ public class TodoManageFacade {
                             .note(noteContent)
                             .noteId(noteId)
                             .shared(todo.isShared())
+                            .priorityOrder(todo.getPriorityOrder())
                             .build();
                 })
                 .collect(Collectors.toList());
 
-        // 순서 정보 생성
-        List<String> order = sortedTodos.stream()
-                .map(todo -> todo.getId().toString())
-                .collect(Collectors.toList());
-
         return TodoListResponseDto.builder()
                 .myTodoList(myTodoList)
-                .order(order)
                 .build();
     }
 
-    private List<Todo> sortTodosByPriority(List<Todo> todos, String priorityOrder) {
-        if (priorityOrder == null || priorityOrder.isEmpty()) {
-            return sortTodosByNewPolicy(todos);
-        }
 
-        List<String> priorityIds = Arrays.asList(priorityOrder.split(","));
 
-        return todos.stream()
-                .sorted((t1, t2) -> {
-                    int index1 = priorityIds.indexOf(t1.getId().toString());
-                    int index2 = priorityIds.indexOf(t2.getId().toString());
 
-                    if (index1 == -1 && index2 == -1) {
-                        // 둘 다 우선순위에 없으면 새로운 정책으로 정렬
-                        return sortTodosByNewPolicy(List.of(t1, t2)).get(0).getId().compareTo(sortTodosByNewPolicy(List.of(t1, t2)).get(1).getId());
-                    } else if (index1 == -1) {
-                        // t1이 우선순위에 없으면 뒤로
-                        return 1;
-                    } else if (index2 == -1) {
-                        // t2가 우선순위에 없으면 뒤로
-                        return -1;
-                    } else {
-                        // 둘 다 우선순위에 있으면 우선순위 오름차순 정렬
-                        return Integer.compare(index1, index2);
-                    }
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 새로운 우선순위 정책에 따른 투두 정렬
-     * 1. createdAt이 있는 투두들을 createdAt 기준 오름차순 정렬
-     * 2. createdAt이 없는 투두들을 기존 priority 기준 내림차순 정렬
-     */
-    private List<Todo> sortTodosByNewPolicy(List<Todo> todos) {
-        return todos.stream()
-                .sorted((t1, t2) -> {
-                    // createdAt이 있는 투두들을 먼저 정렬
-                    boolean t1HasCreatedAt = t1.getCreatedAt() != null;
-                    boolean t2HasCreatedAt = t2.getCreatedAt() != null;
-
-                    if (t1HasCreatedAt && t2HasCreatedAt) {
-                        // 둘 다 createdAt이 있으면 createdAt 기준 오름차순
-                        return t1.getCreatedAt().compareTo(t2.getCreatedAt());
-                    } else if (t1HasCreatedAt && !t2HasCreatedAt) {
-                        // t1만 createdAt이 있으면 t1이 우선
-                        return -1;
-                    } else if (!t1HasCreatedAt && t2HasCreatedAt) {
-                        // t2만 createdAt이 있으면 t2가 우선
-                        return 1;
-                    } else {
-                        // 둘 다 createdAt이 없으면 기존 priority 기준 내림차순
-                        // 현재는 ID 기준으로 정렬 (나중에 priority 필드 추가 시 수정 필요)
-                        return Long.compare(t2.getId(), t1.getId());
-                    }
-                })
-                .collect(Collectors.toList());
-    }
 
     @Transactional
     public void createTodo(Long userId, CreateTodoRequestDto requestDto) {
@@ -191,46 +136,10 @@ public class TodoManageFacade {
             todoService.save(todo);
         }
 
-        // 목표의 모든 투두 조회 및 우선순위 재정렬
-        Long goalId = todo.getGoal().getId();
-        List<Todo> allTodos = todoService.getTodosByGoalId(goalId);
-        String newPriorityOrder = calculateNewPriorityOrder(allTodos);
 
-        // 목표의 우선순위 업데이트
-        goalService.updatePriorityOrder(goalId, newPriorityOrder);
     }
 
-    /**
-     * 새로운 우선순위 정책에 따른 우선순위 문자열 생성
-     * 1. createdAt이 있는 투두들을 createdAt 기준 오름차순 정렬
-     * 2. createdAt이 없는 투두들을 기존 priority 기준 내림차순 정렬
-     */
-    private String calculateNewPriorityOrder(List<Todo> todos) {
-        // 1. createdAt이 있는 투두들을 createdAt 기준 오름차순 정렬
-        List<Todo> todosWithCreatedAt = todos.stream()
-                .filter(todo -> todo.getCreatedAt() != null)
-                .sorted(Comparator.comparing(Todo::getCreatedAt))
-                .collect(Collectors.toList());
 
-        // 2. createdAt이 없는 투두들을 기존 priority 기준 내림차순 정렬
-        List<Todo> todosWithoutCreatedAt = todos.stream()
-                .filter(todo -> todo.getCreatedAt() == null)
-                .sorted((t1, t2) -> {
-                    // 기존 priority 기준 내림차순 정렬
-                    // 현재는 ID 기준으로 정렬 (나중에 priority 필드 추가 시 수정 필요)
-                    return Long.compare(t2.getId(), t1.getId());
-                })
-                .collect(Collectors.toList());
-
-        // 3. 두 리스트를 합쳐서 우선순위 문자열 생성
-        List<Todo> sortedTodos = new ArrayList<>();
-        sortedTodos.addAll(todosWithCreatedAt);
-        sortedTodos.addAll(todosWithoutCreatedAt);
-
-        return sortedTodos.stream()
-                .map(todo -> todo.getId().toString())
-                .collect(Collectors.joining(","));
-    }
 
     public TodoDetailResponseDto getTodoDetail(Long todoId, Long userId) {
         Todo todo = todoService.getTodoById(todoId);
@@ -249,7 +158,27 @@ public class TodoManageFacade {
                 .note(todo.getNote() != null ? todo.getNote().getContent() : "")
                 .noteId(todo.getNote() != null ? todo.getNote().getId().toString() : null)
                 .shared(todo.isShared())
+                .priorityOrder(todo.getPriorityOrder())
                 .build();
+    }
+
+    @Transactional
+    public void updateTodoPriority(Long userId, UpdateTodoPriorityRequestDto requestDto) {
+        Long todoId = requestDto.getTodoId();
+        Integer newPriorityOrder = requestDto.getPriorityOrder();
+        
+        // 투두 조회 및 권한 확인
+        Todo todo = todoService.getTodoById(todoId);
+        Goal goal = todo.getGoal();
+        StudyUser currentUser = studyUserService.getOrThrowIfNotJoined(goal.getStudy().getId(), userId);
+        
+        // 자신의 투두만 우선순위 변경 가능
+        if (!todo.getAssignedUser().getUser().getId().equals(userId)) {
+            throw new RuntimeException("자신의 투두만 우선순위를 변경할 수 있습니다.");
+        }
+        
+        // 우선순위 업데이트
+        todoService.updateTodoPriority(todoId, newPriorityOrder);
     }
 
     public DashboardResponseDto getDashboard(Long goalId, Long userId) {
@@ -276,6 +205,7 @@ public class TodoManageFacade {
                     .note(recentCompletedTodo.getNote() != null ? recentCompletedTodo.getNote().getContent() : "")
                     .noteId(recentCompletedTodo.getNote() != null ? recentCompletedTodo.getNote().getId().toString() : null)
                     .shared(recentCompletedTodo.isShared())
+                    .priorityOrder(recentCompletedTodo.getPriorityOrder())
                     .build();
         }
 
@@ -294,6 +224,7 @@ public class TodoManageFacade {
                     .note(inProgressTodo.getNote() != null ? inProgressTodo.getNote().getContent() : "")
                     .noteId(inProgressTodo.getNote() != null ? inProgressTodo.getNote().getId().toString() : null)
                     .shared(inProgressTodo.isShared())
+                    .priorityOrder(inProgressTodo.getPriorityOrder())
                     .build();
         }
 

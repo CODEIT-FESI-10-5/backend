@@ -32,6 +32,7 @@ public class GoalDetailResponseDto {
         private String note;
         private int order;
         private boolean shared;
+        private Integer priorityOrder;
     }
 
     @Getter

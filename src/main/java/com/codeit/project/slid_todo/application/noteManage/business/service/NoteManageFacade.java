@@ -1,6 +1,9 @@
 package com.codeit.project.slid_todo.application.noteManage.business.service;
 
-import com.codeit.project.slid_todo.application.noteManage.web.dto.*;
+import com.codeit.project.slid_todo.application.noteManage.web.dto.NoteListRequestDto;
+import com.codeit.project.slid_todo.application.noteManage.web.dto.NoteListResponseDto;
+import com.codeit.project.slid_todo.application.noteManage.web.dto.NoteDetailResponseDto;
+import com.codeit.project.slid_todo.application.noteManage.web.dto.UpdateNoteRequestDto;
 import com.codeit.project.slid_todo.domain.goal.persistent.entity.Goal;
 import com.codeit.project.slid_todo.domain.goal.business.service.GoalService;
 import com.codeit.project.slid_todo.domain.todo.business.service.TodoService;
@@ -26,14 +29,18 @@ public class NoteManageFacade {
 
     public NoteListResponseDto getNotesByGoal(NoteListRequestDto requestDto) {
         Long goalId = requestDto.getGoalId();
-        String noteTitle = requestDto.getNoteTitle();
+        String noteContent = requestDto.getNoteContent();
+        
+        // 목표 정보 조회
+        Goal goal = goalService.getGoalById(goalId);
+        
         // N+1 문제 개선: 직접 Note를 조회
-        List<Note> notes = noteRepository.findByGoalIdAndTitleContaining(goalId, noteTitle);
+        List<Note> notes = noteRepository.findByGoalIdAndContentContaining(goalId, noteContent);
 
         List<NoteListResponseDto.NoteData> noteDataList = notes.stream()
                 .map(note -> NoteListResponseDto.NoteData.builder()
                         .id(note.getId())
-                        .title(note.getTitle())
+                        .todoTitle(note.getTodo().getContent())
                         .content(note.getContent())
                         .createdAt(note.getCreatedAt())
                         .updatedAt(note.getUpdatedAt())
@@ -41,7 +48,7 @@ public class NoteManageFacade {
                 .collect(Collectors.toList());
 
         return NoteListResponseDto.builder()
-                .totalCount(noteDataList.size())
+                .studyGoalTitle(goal.getTitle())
                 .notes(noteDataList)
                 .build();
     }
@@ -51,34 +58,25 @@ public class NoteManageFacade {
         
         return NoteDetailResponseDto.builder()
                 .id(note.getId())
-                .title(note.getTitle())
+                .studyGoalTitle(note.getTodo().getGoal().getTitle())
+                .todoTitle(note.getTodo().getContent())
                 .content(note.getContent())
                 .createdAt(note.getCreatedAt())
                 .updatedAt(note.getUpdatedAt())
                 .build();
     }
 
-    @Transactional
-    public NoteDetailResponseDto createNote(Long todoId, CreateNoteRequestDto requestDto) {
-        Note note = noteService.createNote(todoId, requestDto.getTitle(), requestDto.getContent());
-        
-        return NoteDetailResponseDto.builder()
-                .id(note.getId())
-                .title(note.getTitle())
-                .content(note.getContent())
-                .createdAt(note.getCreatedAt())
-                .updatedAt(note.getUpdatedAt())
-                .build();
-    }
+
 
     @Transactional
     public NoteDetailResponseDto updateNote(Long noteId, UpdateNoteRequestDto requestDto) {
-        noteService.updateNote(noteId, requestDto.getTitle(), requestDto.getContent());
+        noteService.updateNote(noteId, requestDto.getContent());
         Note note = noteService.getNoteById(noteId);
         
         return NoteDetailResponseDto.builder()
                 .id(note.getId())
-                .title(note.getTitle())
+                .studyGoalTitle(note.getTodo().getGoal().getTitle())
+                .todoTitle(note.getTodo().getContent())
                 .content(note.getContent())
                 .createdAt(note.getCreatedAt())
                 .updatedAt(note.getUpdatedAt())

@@ -35,7 +35,7 @@ public class DomainNoteRepository {
         jpaNoteRepository.save(note);
     }
 
-    public List<Note> findByGoalIdAndTitleContaining(Long goalId, String noteTitle) {
-        return jpaNoteRepository.findByGoalIdAndTitleContaining(goalId, noteTitle);
+    public List<Note> findByGoalIdAndContentContaining(Long goalId, String noteContent) {
+        return jpaNoteRepository.findByGoalIdAndContentContaining(goalId, noteContent);
     }
 } 

@@ -13,7 +13,4 @@ public class GoalResponseDto {
     
     @Schema(description = "목표 제목", example = "스프링 부트 마스터하기")
     private String title;
-    
-    @Schema(description = "우선순위 순서", example = "1,2,3,4,5")
-    private String priorityOrder;
 } 

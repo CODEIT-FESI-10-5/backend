@@ -49,8 +49,8 @@ public class SwaggerConfig {
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))
                 .servers(List.of(
-                        new Server().url("http://localhost:8080").description("Local Development Server"),
-                        new Server().url("https://api.slidtodo.com").description("Production Server")
+                        new Server().url("https://api.modudo.shop").description("Production Server"),
+                        new Server().url("http://localhost:8080").description("Local Development Server")
                 ))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth", 

@@ -23,6 +23,6 @@ public interface JpaNoteRepository extends JpaRepository<Note, Long> {
            "LEFT JOIN FETCH n.todo t " +
            "LEFT JOIN FETCH t.goal g " +
            "WHERE g.id = :goalId AND n.isDeleted = false " +
-           "AND (:noteTitle IS NULL OR n.title LIKE %:noteTitle%)")
-    List<Note> findByGoalIdAndTitleContaining(@Param("goalId") Long goalId, @Param("noteTitle") String noteTitle);
+           "AND (:noteContent IS NULL OR n.content LIKE %:noteContent%)")
+    List<Note> findByGoalIdAndContentContaining(@Param("goalId") Long goalId, @Param("noteContent") String noteContent);
 } 

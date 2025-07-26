@@ -28,19 +28,15 @@ public class Goal extends BaseDateTime {
     @Column(nullable = true)
     private String title;
 
-    @Column(name = "priority_order")
-    private String priorityOrder; // "1,2,5,4,3,6,7,8,9,10" 형태로 저장
-
     private boolean isDeleted = false;
 
     @OneToMany(mappedBy = "goal")
     private List<Todo> todos = new ArrayList<>();
 
     @Builder
-    public Goal(Study study, String title, String priorityOrder) {
+    public Goal(Study study, String title) {
         addStudy(study);
         this.title = title;
-        this.priorityOrder = priorityOrder;
     }
 
     private void addStudy(Study study) {
@@ -52,10 +48,6 @@ public class Goal extends BaseDateTime {
 
     public void updateTitle(String title) {
         this.title = title;
-    }
-
-    public void updatePriorityOrder(String priorityOrder) {
-        this.priorityOrder = priorityOrder;
     }
 
     public void delete() {

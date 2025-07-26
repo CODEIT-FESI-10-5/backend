@@ -1,7 +1,11 @@
 package com.codeit.project.slid_todo.application.goalManage.web.controller;
 
 import com.codeit.project.slid_todo.application.goalManage.business.service.GoalManageFacade;
-import com.codeit.project.slid_todo.application.goalManage.web.dto.*;
+import com.codeit.project.slid_todo.application.goalManage.web.dto.GoalCreateRequestDto;
+import com.codeit.project.slid_todo.application.goalManage.web.dto.GoalDetailResponseDto;
+import com.codeit.project.slid_todo.application.goalManage.web.dto.GoalListResponseDto;
+import com.codeit.project.slid_todo.application.goalManage.web.dto.GoalResponseDto;
+import com.codeit.project.slid_todo.application.goalManage.web.dto.GoalUpdateRequestDto;
 import com.codeit.project.slid_todo.common.annotation.CurrentUser;
 import com.codeit.project.slid_todo.common.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -73,17 +77,20 @@ public class GoalManageController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @PatchMapping("/api/goals/{goalId}/priority")
-    @Operation(summary = "투두 우선순위 수정", description = "드래그앤드롭으로 변경된 투두 우선순위를 업데이트합니다.")
-    public ResponseEntity<ResponseDto<GoalResponseDto>> updateGoalPriority(
-            @Parameter(description = "목표 ID", example = "1") @PathVariable Long goalId,
-            @CurrentUser Long userId,
-            @Valid @RequestBody GoalPriorityUpdateRequestDto requestDto) {
-        GoalResponseDto response = goalManageFacade.updateGoalPriority(goalId, userId, requestDto);
-        ResponseDto<GoalResponseDto> responseDto = ResponseDto.<GoalResponseDto>builder()
+
+
+    @GetMapping("/api/studies/{studyId}/goals")
+    @Operation(summary = "스터디별 목표 목록 조회", description = "특정 스터디의 모든 목표 목록을 조회합니다.")
+    public ResponseEntity<ResponseDto<GoalListResponseDto>> getGoalsByStudyId(
+            @Parameter(description = "스터디 ID", example = "1") @PathVariable Long studyId) {
+        
+        GoalListResponseDto response = goalManageFacade.getGoalsByStudyId(studyId);
+        
+        ResponseDto<GoalListResponseDto> responseDto = ResponseDto.<GoalListResponseDto>builder()
                 .httpStatusCode(HttpStatus.OK.value())
                 .data(response)
                 .build();
+        
         return ResponseEntity.ok(responseDto);
     }
 } 

@@ -11,8 +11,8 @@ import java.util.List;
 @Builder
 @Schema(description = "노트 목록 조회 응답")
 public class NoteListResponseDto {
-    @Schema(description = "전체 노트 개수", example = "5")
-    private int totalCount;
+    @Schema(description = "스터디 목표 제목", example = "스프링 부트 마스터하기")
+    private String studyGoalTitle;
     
     @Schema(description = "노트 목록")
     private List<NoteData> notes;
@@ -24,8 +24,8 @@ public class NoteListResponseDto {
         @Schema(description = "노트 ID", example = "1")
         private Long id;
         
-        @Schema(description = "노트 제목", example = "스프링 부트 학습 노트")
-        private String title;
+        @Schema(description = "투두 제목", example = "스프링 부트 공부하기")
+        private String todoTitle;
         
         @Schema(description = "노트 내용", example = "스프링 부트 기초부터 심화까지 학습한 내용을 정리합니다.")
         private String content;

@@ -14,9 +14,6 @@ public class TodoListResponseDto {
 
     @Schema(description = "투두 목록")
     private List<TodoData> myTodoList;
-    
-    @Schema(description = "투두 순서 (투두 ID 목록)", example = "[\"1\", \"2\", \"3\", \"4\"]")
-    private List<String> order;
 
     @Getter
     @Builder
@@ -45,5 +42,8 @@ public class TodoListResponseDto {
         
         @Schema(description = "공유 투두 여부", example = "false")
         private boolean shared;
+        
+        @Schema(description = "우선순위", example = "1")
+        private Integer priorityOrder;
     }
 } 
