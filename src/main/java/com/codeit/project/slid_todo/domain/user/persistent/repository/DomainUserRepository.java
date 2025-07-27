@@ -34,6 +34,11 @@ public class DomainUserRepository {
                 .orElseThrow(() -> new BaseException(UserErrorCode.NOT_EXIST_USER));
     }
 
+    public User getByNicknameOrThrow(String nickname) {
+        return jpaUserRepository.findByNicknameAndIsDeletedFalse(nickname)
+                .orElse(null);
+    }
+
     public User findByEmail(String email) {
         return jpaUserRepository.findByEmailAndIsDeletedFalse(email).orElse(null);
     }
