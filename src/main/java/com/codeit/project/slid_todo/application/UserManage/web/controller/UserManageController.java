@@ -29,14 +29,16 @@ public class UserManageController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @Operation(summary = "마이페이지 프로필 수정", description = "닉네임과 프로필 이미지를 수정합니다.")
-    public ResponseEntity<ResponseDto<Void>> editProfile(
+    public ResponseEntity<ResponseDto<EditProfileDto.Response>> editProfile(
             @ModelAttribute EditProfileDto.Request editProfileDto,
             @CurrentUser Long userId
     ) throws IOException {
-        userManageFacade.editProfile(editProfileDto, userId);
 
-        ResponseDto<Void> response = ResponseDto.<Void>builder()
+        EditProfileDto.Response responseData = userManageFacade.editProfile(editProfileDto, userId);
+
+        ResponseDto<EditProfileDto.Response> response = ResponseDto.<EditProfileDto.Response>builder()
                 .httpStatusCode(HttpStatus.OK.value())
+                .data(responseData)
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

@@ -50,9 +50,14 @@ public class UserService {
     }
 
     public User updateProfile(User user, String nickname, UploadImg UploadImg) {
-        validateDuplicateNickname(nickname);
+        validateDuplicateNickname(user.getId(), nickname);
         user.updateProfile(nickname, UploadImg);
         return user;
+    }
+
+    private boolean validateDuplicateNickname(Long userId, String nickname) {
+        User user = userRepository.getByNicknameOrThrow(nickname);
+        return user == null || user.getId().equals(userId);
     }
 
     public User findUserById(Long userId) {

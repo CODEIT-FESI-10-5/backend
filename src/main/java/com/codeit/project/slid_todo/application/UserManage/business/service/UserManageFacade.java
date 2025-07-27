@@ -7,11 +7,13 @@ import com.codeit.project.slid_todo.common.vo.UploadImg;
 import com.codeit.project.slid_todo.domain.user.business.service.UserService;
 import com.codeit.project.slid_todo.domain.user.persistent.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -21,16 +23,22 @@ public class UserManageFacade {
     private final ImgStore imgStore;
 
     @Transactional
-    public void editProfile(EditProfileDto.Request dto, Long userId) throws IOException {
+    public EditProfileDto.Response editProfile(EditProfileDto.Request dto, Long userId) throws IOException {
         User user = userService.findUserById(userId);
 
         UploadImg newImage = handleProfileImageUpdate(dto, user);
+
+        log.info("action={}", dto.profileImageAction());
+        log.info("dto.newImage={}", dto.newImageFile());
+        log.info("newImage={}", newImage);
 
         user = userService.updateProfile(user, dto.nickname(), newImage);
 
         if (dto.currentPassword() != null && dto.newPassword() != null) {
             userService.changePassword(user, dto.currentPassword(), dto.newPassword());
         }
+
+        return EditProfileDto.Response.from(user);
     }
 
     private UploadImg handleProfileImageUpdate(EditProfileDto.Request dto, User user) throws IOException {

@@ -22,6 +22,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .id(findUser.getId())
                 .email(findUser.getEmail())
                 .password(findUser.getPassword())
+                .nickname(findUser.getNickname())
+                .imgDir(
+                        findUser.getImg() != null ?
+                                findUser.getImg().getStoreImgDir()
+                                : ""
+                )
                 .build();
     }
 }

@@ -22,7 +22,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
-            LoginDto loginDto = objectMapper.readValue(request.getInputStream(), LoginDto.class);
+            LoginDto.Request loginDto = objectMapper.readValue(request.getInputStream(), LoginDto.Request.class);
             UsernamePasswordAuthenticationToken authenticationToken = createAuthenticationToken(loginDto);
             return getAuthenticationManager().authenticate(authenticationToken);
         } catch (IOException e) {
@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
     }
 
-    private UsernamePasswordAuthenticationToken createAuthenticationToken(LoginDto loginDto) {
+    private UsernamePasswordAuthenticationToken createAuthenticationToken(LoginDto.Request loginDto) {
         String email = loginDto.email();
         String password = loginDto.password();
         return new UsernamePasswordAuthenticationToken(email, password);
