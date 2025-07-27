@@ -16,11 +16,15 @@ public class CustomUserDetails implements UserDetails {
     private final Long id;
     private final String email;
     private final String password;
+    private final String nickname;
+    private final String imgDir;
 
     public CustomUserDetails(Claims claims) {
         this.id = claims.get("id", Long.class);
         this.email = claims.getSubject();
         this.password = "";
+        this.nickname = "";
+        this.imgDir = "";
     }
 
     public Long getUserIdx() {
@@ -42,7 +46,11 @@ public class CustomUserDetails implements UserDetails {
         return email;
     }
 
-        @Override
+    public String getNickname() { return nickname; }
+
+    public String getImgDir() { return imgDir; }
+
+    @Override
     public boolean isAccountNonExpired() {
         return true;
     }
