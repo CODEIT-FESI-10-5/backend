@@ -19,6 +19,9 @@ public class ImgStore {
     @Value("${img.dir}")
     private String ImgDir;
 
+    @Value("${server.base-url}")
+    private String baseUrl;
+
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
 
@@ -32,7 +35,8 @@ public class ImgStore {
 
         image.transferTo(new File(getFullPath(storeFileName)));
 
-        return new UploadImg(originalFileName, getFullPath(storeFileName));
+        String imageUrl = baseUrl + "/images/" + storeFileName;
+        return new UploadImg(originalFileName, imageUrl);
     }
 
     private boolean isEmpty(MultipartFile file) {
