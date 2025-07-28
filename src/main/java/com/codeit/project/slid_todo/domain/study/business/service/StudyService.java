@@ -24,6 +24,8 @@ public class StudyService {
         String inviteCode = generateUniqueInviteCode();
 
         Study study = Study.builder()
+                .title("스터디 제목을 적어주세요...")
+                .description("스터디 목표나 응원 메시지를 적어주세요...")
                 .inviteCode(inviteCode)
                 .build();
 
