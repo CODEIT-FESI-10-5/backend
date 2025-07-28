@@ -22,6 +22,20 @@ public class AuthController {
 
     private final AuthFacade authFacade;
 
+    @GetMapping("/api/auth/check")
+    @Operation(
+            summary = "로그인 상태 확인",
+            description = "HttpOnly 쿠키에 포함된 JWT 토큰을 검증하여 로그인 상태를 확인합니다."
+    )
+    public ResponseEntity<ResponseDto<Void>> checkAuth() {
+
+        ResponseDto<Void> response = ResponseDto.<Void>builder()
+                .httpStatusCode(HttpStatus.OK.value())
+                .build();
+
+        return ResponseEntity.status(response.getHttpStatusCode()).body(response);
+    }
+
     @PostMapping("/api/user/signup")
     @Operation(summary = "회원가입", description = "사용자 정보를 받아 회원가입을 수행합니다.")
     public ResponseEntity<ResponseDto<Void>> singup(
@@ -51,7 +65,7 @@ public class AuthController {
     @PostMapping("/api/auth/reissue")
     @Operation(summary = "토큰 재발급", description = "Access Token이 만료되었을 때 Refresh Token으로 재발급합니다.")
     public ResponseEntity<ResponseDto<Void>> reissue(HttpServletRequest request, HttpServletResponse response) {
-        authFacade.reissue(request,response);
+        authFacade.reissue(request, response);
 
         ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
                 .httpStatusCode(HttpStatus.OK.value())
