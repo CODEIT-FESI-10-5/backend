@@ -44,8 +44,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 //    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+//    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+//    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
@@ -71,26 +71,26 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-// querydsl generated route setting
-def querydslDir = "build/generated/querydsl"
-
-tasks.withType(JavaCompile) {
-	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
-}
-
-sourceSets {
-	main {
-		java {
-			srcDirs(querydslDir)
-		}
-	}
-}
-
-tasks.named("clean") {
-	doLast {
-		file(querydslDir).deleteRecursively()
-	}
-}
+//querydsl generated route setting
+//def querydslDir = "build/generated/querydsl"
+//
+//tasks.withType(JavaCompile) {
+//	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+//}
+//
+//sourceSets {
+//	main {
+//		java {
+//			srcDirs(querydslDir)
+//		}
+//	}
+//}
+//
+//tasks.named("clean") {
+//	doLast {
+//		file(querydslDir).deleteRecursively()
+//	}
+//}
 
 tasks.named('test') {
     useJUnitPlatform()
