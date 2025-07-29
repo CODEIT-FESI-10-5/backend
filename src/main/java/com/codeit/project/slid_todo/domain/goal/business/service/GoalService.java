@@ -24,7 +24,7 @@ public class GoalService {
 
     public Goal createGoal(Long studyId, String title) {
         Study study = studyRepository.getByIdOrThrow(studyId);
-        
+
         // 목표 개수 제한 확인
         long currentGoalCount = goalRepository.countByStudyId(studyId);
         if (currentGoalCount >= MAX_GOALS_PER_STUDY) {
@@ -42,6 +42,10 @@ public class GoalService {
 
     public Goal getGoalById(Long goalId) {
         return goalRepository.getByIdOrThrow(goalId);
+    }
+
+    public Goal findGoalWithStudyByGoalId(Long goalId) {
+        return goalRepository.findWithStudyByIdOrThrow(goalId);
     }
 
     public List<Goal> getGoalsByStudyId(Long studyId) {

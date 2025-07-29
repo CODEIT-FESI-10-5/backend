@@ -22,6 +22,11 @@ public class DomainGoalRepository {
                 .orElseThrow(() -> new BaseException(GoalErrorCode.NOT_EXIST_GOAL));
     }
 
+    public Goal findWithStudyByIdOrThrow(Long goalId) {
+        return jpaGoalRepository.findWithStudyByIdAndIsDeletedFalse(goalId)
+                .orElseThrow(() -> new BaseException(GoalErrorCode.NOT_EXIST_GOAL));
+    }
+
     public List<Goal> findByStudyId(Long studyId) {
         return jpaGoalRepository.findByStudyIdAndNotDeleted(studyId);
     }
