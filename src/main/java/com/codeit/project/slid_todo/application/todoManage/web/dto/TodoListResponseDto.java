@@ -1,5 +1,6 @@
 package com.codeit.project.slid_todo.application.todoManage.web.dto;
 
+import com.codeit.project.slid_todo.domain.studyUser.persistent.entity.enums.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +15,10 @@ public class TodoListResponseDto {
 
     @Schema(description = "투두 목록")
     private List<TodoData> myTodoList;
+
+    private String goalTitle;
+
+    private UserRole userRole;
 
     @Getter
     @Builder

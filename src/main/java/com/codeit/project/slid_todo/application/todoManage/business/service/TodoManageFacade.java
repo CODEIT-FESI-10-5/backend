@@ -33,7 +33,9 @@ public class TodoManageFacade {
     private final StudyUserService studyUserService;
 
     public TodoListResponseDto getTodoList(Long goalId, Long userId) {
-        Goal goal = goalService.getGoalById(goalId);
+        Goal goal = goalService.findGoalWithStudyByGoalId(goalId);
+
+        StudyUser studyUser = studyUserService.getOrThrowIfNotJoined(goal.getStudy().getId(), userId);
 
         // 사용자의 투두 목록 조회 (우선순위 순서대로)
         List<Todo> userTodos = todoService.getTodosByGoalIdAndUserId(goalId, userId);
@@ -66,6 +68,8 @@ public class TodoManageFacade {
                 .collect(Collectors.toList());
 
         return TodoListResponseDto.builder()
+                .goalTitle(goal.getTitle() != null ? goal.getTitle() : "")
+                .userRole(studyUser.getUserRole())
                 .myTodoList(myTodoList)
                 .build();
     }
