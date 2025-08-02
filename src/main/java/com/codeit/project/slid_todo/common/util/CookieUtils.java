@@ -13,6 +13,7 @@ public class CookieUtils {
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/");
+        cookie.setDomain("modudo.shop");
         cookie.setAttribute("SameSite", "None");
         return cookie;
     }
@@ -23,6 +24,7 @@ public class CookieUtils {
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/");
+        cookie.setDomain("modudo.shop");
         cookie.setAttribute("SameSite", "None");
         return cookie;
     }
