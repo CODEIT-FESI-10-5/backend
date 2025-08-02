@@ -109,12 +109,14 @@ public class TodoService {
         return todoRepository.findByGoalIdAndUserId(goalId, userId);
     }
 
-    public void updateTodoContentAndCompleted(Long todoId, String content, boolean completed) {
+    public void updateTodoContentAndCompleted(Long todoId, String content, Boolean completed) {
         Todo todo = todoRepository.getByIdOrThrow(todoId);
         todo.updateContent(content);
         
-        if (completed != todo.isCompleted()) {
+        // completed가 null이 아닌 경우에만 처리
+        if (completed != null && completed != todo.isCompleted()) {
             todo.toggleComplete();
+            adjustPriorityWhenUncomplete(todo);
         }
         
         todoRepository.save(todo);
@@ -158,7 +160,7 @@ public class TodoService {
         Long userId = todo.getAssignedUser().getUser().getId();
         
         // 우선순위 변경 시 같은 사용자의 다른 투두들의 우선순위 조정
-        adjustPriorityOrdersByUserId(goalId, userId, newPriorityOrder);
+        adjustPriorityOrdersByUserId(goalId, userId, todo.getPriorityOrder(), newPriorityOrder);
         
         // 해당 투두의 우선순위 업데이트
         todo.updatePriorityOrder(newPriorityOrder);
@@ -186,14 +188,57 @@ public class TodoService {
         }
     }
 
-    private void adjustPriorityOrdersByUserId(Long goalId, Long userId, Integer newPriorityOrder) {
-        // 같은 사용자의 새로운 우선순위 이상인 투두들을 조회
-        List<Todo> todosToAdjust = todoRepository.findByGoalIdAndUserIdAndPriorityOrderGreaterThanEqual(goalId, userId, newPriorityOrder);
+    private void adjustPriorityOrdersByUserId(
+            Long goalId, Long userId,Integer asIsPriorityOrder, Integer newPriorityOrder
+    ) {
+        if(asIsPriorityOrder < newPriorityOrder) {
+            // 예시
+            // asIsPriorityOrder = 2
+            // newPriorityOrder = 4
+            // 2->4 이동시 3번보다 크고 4번보다 같거나 작은 모든 목록 조회
+            List<Todo> todosToAdjust = todoRepository.findByGoalIdAndUserIdAndPriorityOrderBetween(goalId, userId, asIsPriorityOrder + 1, newPriorityOrder);
+
+            // 우선순위를 하나씩 감소
+            for (Todo todo : todosToAdjust) {
+                todo.updatePriorityOrder(todo.getPriorityOrder() - 1);
+                todoRepository.save(todo);
+            }
+        }else if(asIsPriorityOrder > newPriorityOrder){
+            // 예시
+            // asIsPriorityOrder = 4
+            // newPriorityOrder = 2
+            // 4->2 이동시 2번보다 크거나 같고 4번보다 작은 목록 조회
+            List<Todo> todosToAdjust = todoRepository.findByGoalIdAndUserIdAndPriorityOrderBetween(goalId, userId, newPriorityOrder, asIsPriorityOrder - 1);
+
+            // 우선순위를 하나씩 증가
+            for (Todo todo : todosToAdjust) {
+                todo.updatePriorityOrder(todo.getPriorityOrder() + 1);
+                todoRepository.save(todo);
+            }
+        }
+    }
+
+    private void adjustPriorityWhenUncomplete(Todo todo) {
+        Long goalId = todo.getGoal().getId();
+        Long userId = todo.getAssignedUser().getUser().getId();
         
-        // 우선순위를 하나씩 증가
-        for (Todo todo : todosToAdjust) {
-            todo.updatePriorityOrder(todo.getPriorityOrder() + 1);
-            todoRepository.save(todo);
+        // 해당 목표 하위의 모든 투두 중 가장 낮은 우선순위 찾기
+        Integer maxPriorityOrder = todoRepository.findMaxPriorityOrderByGoalIdAndUserId(goalId, userId);
+        
+        if (maxPriorityOrder != null) {
+            // 취소할 투두의 우선순위를 가장 낮은 우선순위로 설정
+            Integer newPriorityOrder = maxPriorityOrder + 1;
+            
+            // 취소할 투두보다 높은 우선순위를 가진 투두들의 우선순위를 -1씩 조정
+            List<Todo> todosToAdjust = todoRepository.findByGoalIdAndUserIdAndPriorityOrderGreaterThan(goalId, userId, todo.getPriorityOrder());
+            
+            for (Todo todoToAdjust : todosToAdjust) {
+                todoToAdjust.updatePriorityOrder(todoToAdjust.getPriorityOrder() - 1);
+                todoRepository.save(todoToAdjust);
+            }
+            
+            // 취소할 투두의 우선순위를 가장 낮은 우선순위로 설정
+            todo.updatePriorityOrder(newPriorityOrder);
         }
     }
 } 

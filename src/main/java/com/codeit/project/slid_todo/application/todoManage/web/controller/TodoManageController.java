@@ -89,21 +89,6 @@ public class TodoManageController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @PatchMapping("/api/todos/{todoId}/complete")
-    @Operation(summary = "투두 완료", description = "투두를 완료 처리하고 우선순위를 재정렬합니다.")
-    public ResponseEntity<ResponseDto<Void>> completeTodo(
-            @Parameter(description = "투두 ID", example = "1") @PathVariable("todoId") Long todoId,
-            @CurrentUser Long userId) {
-
-        todoManageFacade.completeTodo(todoId, userId);
-
-        ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
-                .httpStatusCode(HttpStatus.OK.value())
-                .build();
-
-        return ResponseEntity.ok(responseDto);
-    }
-
 //    @GetMapping("/api/todos/{todoId}")
 //    @Operation(summary = "투두 상세 조회", description = "특정 투두의 상세 정보를 조회합니다.")
 //    public ResponseEntity<ResponseDto<TodoDetailResponseDto>> getTodoDetail(

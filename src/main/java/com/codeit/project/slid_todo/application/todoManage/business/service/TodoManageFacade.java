@@ -173,9 +173,7 @@ public class TodoManageFacade {
         
         // 투두 조회 및 권한 확인
         Todo todo = todoService.getTodoById(todoId);
-        Goal goal = todo.getGoal();
-        StudyUser currentUser = studyUserService.getOrThrowIfNotJoined(goal.getStudy().getId(), userId);
-        
+
         // 자신의 투두만 우선순위 변경 가능
         if (!todo.getAssignedUser().getUser().getId().equals(userId)) {
             throw new RuntimeException("자신의 투두만 우선순위를 변경할 수 있습니다.");
