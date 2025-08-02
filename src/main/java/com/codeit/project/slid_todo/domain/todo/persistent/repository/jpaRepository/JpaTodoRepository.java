@@ -94,4 +94,28 @@ public interface JpaTodoRepository extends JpaRepository<Todo, Long> {
             "WHERE t.goal.id = :goalId AND t.assignedUser.user.id = :userId AND t.priorityOrder >= :priorityOrder AND t.isDeleted = false " +
             "ORDER BY t.priorityOrder ASC")
     List<Todo> findByGoalIdAndUserIdAndPriorityOrderGreaterThanEqual(@Param("goalId") Long goalId, @Param("userId") Long userId, @Param("priorityOrder") Integer priorityOrder);
+
+    @Query("SELECT t FROM Todo t " +
+            "LEFT JOIN FETCH t.note " +
+            "LEFT JOIN FETCH t.assignedUser su " +
+            "LEFT JOIN FETCH su.user " +
+            "WHERE t.goal.id = :goalId AND t.assignedUser.user.id = :userId AND t.priorityOrder <= :priorityOrder AND t.isDeleted = false " +
+            "ORDER BY t.priorityOrder ASC")
+    List<Todo> findByGoalIdAndUserIdAndPriorityOrderLessThanEqual(@Param("goalId") Long goalId, @Param("userId") Long userId, @Param("priorityOrder") Integer priorityOrder);
+
+    @Query("SELECT t FROM Todo t " +
+            "LEFT JOIN FETCH t.note " +
+            "LEFT JOIN FETCH t.assignedUser su " +
+            "LEFT JOIN FETCH su.user " +
+            "WHERE t.goal.id = :goalId AND t.assignedUser.user.id = :userId AND t.priorityOrder BETWEEN :startPriority AND :endPriority AND t.isDeleted = false " +
+            "ORDER BY t.priorityOrder ASC")
+    List<Todo> findByGoalIdAndUserIdAndPriorityOrderBetween(@Param("goalId") Long goalId, @Param("userId") Long userId, @Param("startPriority") Integer startPriority, @Param("endPriority") Integer endPriority);
+
+    @Query("SELECT t FROM Todo t " +
+            "LEFT JOIN FETCH t.note " +
+            "LEFT JOIN FETCH t.assignedUser su " +
+            "LEFT JOIN FETCH su.user " +
+            "WHERE t.goal.id = :goalId AND t.assignedUser.user.id = :userId AND t.priorityOrder > :priorityOrder AND t.isDeleted = false " +
+            "ORDER BY t.priorityOrder ASC")
+    List<Todo> findByGoalIdAndUserIdAndPriorityOrderGreaterThan(@Param("goalId") Long goalId, @Param("userId") Long userId, @Param("priorityOrder") Integer priorityOrder);
 } 

@@ -85,4 +85,16 @@ public class DomainTodoRepository {
     public List<Todo> findByGoalIdAndUserIdAndPriorityOrderGreaterThanEqual(Long goalId, Long userId, Integer priorityOrder) {
         return jpaTodoRepository.findByGoalIdAndUserIdAndPriorityOrderGreaterThanEqual(goalId, userId, priorityOrder);
     }
+
+    public List<Todo> findByGoalIdAndUserIdAndPriorityOrderLessThanEqual(Long goalId, Long userId, Integer priorityOrder) {
+        return jpaTodoRepository.findByGoalIdAndUserIdAndPriorityOrderLessThanEqual(goalId, userId, priorityOrder);
+    }
+
+    public List<Todo> findByGoalIdAndUserIdAndPriorityOrderBetween(Long goalId, Long userId, Integer startPriority, Integer endPriority) {
+        return jpaTodoRepository.findByGoalIdAndUserIdAndPriorityOrderBetween(goalId, userId, startPriority, endPriority);
+    }
+
+    public List<Todo> findByGoalIdAndUserIdAndPriorityOrderGreaterThan(Long goalId, Long userId, Integer priorityOrder) {
+        return jpaTodoRepository.findByGoalIdAndUserIdAndPriorityOrderGreaterThan(goalId, userId, priorityOrder);
+    }
 } 
