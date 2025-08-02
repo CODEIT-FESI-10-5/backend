@@ -87,6 +87,12 @@ public interface JpaTodoRepository extends JpaRepository<Todo, Long> {
     @Query("SELECT MAX(t.priorityOrder) FROM Todo t WHERE t.goal.id = :goalId AND t.assignedUser.user.id = :userId AND t.isDeleted = false")
     Integer findMaxPriorityOrderByGoalIdAndUserId(@Param("goalId") Long goalId, @Param("userId") Long userId);
 
+    @Query("SELECT MAX(t.priorityOrder) FROM Todo t WHERE t.goal.id = :goalId AND t.assignedUser.user.id = :userId AND t.completed = false AND t.isDeleted = false")
+    Integer findMaxPriorityOrderByGoalIdAndUserIdAndNotCompleted(@Param("goalId") Long goalId, @Param("userId") Long userId);
+
+    @Query("SELECT MAX(t.priorityOrder) FROM Todo t WHERE t.goal.id = :goalId AND t.assignedUser.user.id = :userId AND t.completed = false AND t.id != :excludeTodoId AND t.isDeleted = false")
+    Integer findMaxPriorityOrderByGoalIdAndUserIdAndNotCompletedExcludingTodo(@Param("goalId") Long goalId, @Param("userId") Long userId, @Param("excludeTodoId") Long excludeTodoId);
+
     @Query("SELECT t FROM Todo t " +
             "LEFT JOIN FETCH t.note " +
             "LEFT JOIN FETCH t.assignedUser su " +

@@ -82,6 +82,14 @@ public class DomainTodoRepository {
         return jpaTodoRepository.findMaxPriorityOrderByGoalIdAndUserId(goalId, userId);
     }
 
+    public Integer findMaxPriorityOrderByGoalIdAndUserIdAndNotCompleted(Long goalId, Long userId) {
+        return jpaTodoRepository.findMaxPriorityOrderByGoalIdAndUserIdAndNotCompleted(goalId, userId);
+    }
+
+    public Integer findMaxPriorityOrderByGoalIdAndUserIdAndNotCompletedExcludingTodo(Long goalId, Long userId, Long excludeTodoId) {
+        return jpaTodoRepository.findMaxPriorityOrderByGoalIdAndUserIdAndNotCompletedExcludingTodo(goalId, userId, excludeTodoId);
+    }
+
     public List<Todo> findByGoalIdAndUserIdAndPriorityOrderGreaterThanEqual(Long goalId, Long userId, Integer priorityOrder) {
         return jpaTodoRepository.findByGoalIdAndUserIdAndPriorityOrderGreaterThanEqual(goalId, userId, priorityOrder);
     }

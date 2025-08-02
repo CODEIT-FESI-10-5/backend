@@ -222,11 +222,11 @@ public class TodoService {
         Long goalId = todo.getGoal().getId();
         Long userId = todo.getAssignedUser().getUser().getId();
         
-        // 해당 목표 하위의 모든 투두 중 가장 낮은 우선순위 찾기
-        Integer maxPriorityOrder = todoRepository.findMaxPriorityOrderByGoalIdAndUserId(goalId, userId);
+        // 해당 목표 하위의 미완료 투두 중에서 현재 투두를 제외한 가장 낮은 우선순위 찾기
+        Integer maxPriorityOrder = todoRepository.findMaxPriorityOrderByGoalIdAndUserIdAndNotCompletedExcludingTodo(goalId, userId, todo.getId());
         
         if (maxPriorityOrder != null) {
-            // 취소할 투두의 우선순위를 가장 낮은 우선순위로 설정
+            // 취소할 투두의 우선순위를 미완료 투두 중 가장 낮은 우선순위로 설정
             Integer newPriorityOrder = maxPriorityOrder + 1;
             
             // 취소할 투두보다 높은 우선순위를 가진 투두들의 우선순위를 -1씩 조정
@@ -237,7 +237,7 @@ public class TodoService {
                 todoRepository.save(todoToAdjust);
             }
             
-            // 취소할 투두의 우선순위를 가장 낮은 우선순위로 설정
+            // 취소할 투두의 우선순위를 미완료 투두 중 가장 낮은 우선순위로 설정
             todo.updatePriorityOrder(newPriorityOrder);
         }
     }
