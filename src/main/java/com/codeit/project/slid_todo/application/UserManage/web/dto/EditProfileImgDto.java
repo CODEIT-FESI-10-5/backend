@@ -6,11 +6,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import org.springframework.web.multipart.MultipartFile;
 
-public record EditProfileDto() {
+public record EditProfileImgDto() {
 
     public record Request(
-            String nickname,
-
             @Schema(
                     description = """
                             프로필 이미지 변경 동작 옵션
@@ -23,24 +21,16 @@ public record EditProfileDto() {
             ProfileImageUpdateAction profileImageAction,
 
             @Schema(description = "새 프로필 이미지 파일 (UPLOAD일 경우 필수)", type = "string", format = "binary")
-            MultipartFile newImageFile,
-
-            String currentPassword,
-
-            String newPassword
+            MultipartFile newImageFile
     ) {
     }
 
     @Builder
     public record Response(
-            String email,
-            String nickname,
             String profileImg
     ) {
-        public static EditProfileDto.Response from(User user) {
-            return EditProfileDto.Response.builder()
-                    .email(user.getEmail())
-                    .nickname(user.getNickname())
+        public static EditProfileImgDto.Response from(User user) {
+            return EditProfileImgDto.Response.builder()
                     .profileImg(
                             user.getImg() != null ?
                                     user.getImg().getStoreImgDir()

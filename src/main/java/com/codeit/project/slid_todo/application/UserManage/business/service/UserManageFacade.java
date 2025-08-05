@@ -1,7 +1,9 @@
 package com.codeit.project.slid_todo.application.UserManage.business.service;
 
 import com.codeit.project.slid_todo.application.UserManage.Enums.ProfileImageUpdateAction;
-import com.codeit.project.slid_todo.application.UserManage.web.dto.EditProfileDto;
+import com.codeit.project.slid_todo.application.UserManage.web.dto.EditNicknameDto;
+import com.codeit.project.slid_todo.application.UserManage.web.dto.EditPasswordDto;
+import com.codeit.project.slid_todo.application.UserManage.web.dto.EditProfileImgDto;
 import com.codeit.project.slid_todo.common.util.ImgStore;
 import com.codeit.project.slid_todo.common.vo.UploadImg;
 import com.codeit.project.slid_todo.domain.user.business.service.UserService;
@@ -23,29 +25,33 @@ public class UserManageFacade {
     private final ImgStore imgStore;
 
     @Transactional
-    public EditProfileDto.Response editProfile(EditProfileDto.Request dto, Long userId) throws IOException {
+    public EditNicknameDto.Response editNickname(EditNicknameDto.Request dto, Long userId) throws IOException {
         User user = userService.findUserById(userId);
+        user = userService.updateNickname(user, dto.nickname());
+        return EditNicknameDto.Response.from(user);
+    }
 
-        UploadImg newImage = handleProfileImageUpdate(dto, user);
-
-        log.info("action={}", dto.profileImageAction());
-        log.info("dto.newImage={}", dto.newImageFile());
-        log.info("newImage={}", newImage);
-
-        user = userService.updateProfile(user, dto.nickname(), newImage);
+    @Transactional
+    public void editPassword(EditPasswordDto.Request dto, Long userId) throws IOException {
+        User user = userService.findUserById(userId);
 
         if (dto.currentPassword() != null && dto.newPassword() != null) {
             userService.changePassword(user, dto.currentPassword(), dto.newPassword());
         }
-
-        return EditProfileDto.Response.from(user);
     }
 
-    private UploadImg handleProfileImageUpdate(EditProfileDto.Request dto, User user) throws IOException {
+    @Transactional
+    public EditProfileImgDto.Response editProfileImg(EditProfileImgDto.Request dto, Long userId) throws IOException {
+        User user = userService.findUserById(userId);
+        UploadImg newImage = handleProfileImageUpdate(dto, user);
+        user = userService.updateProfileImg(user, newImage);
+        return EditProfileImgDto.Response.from(user);
+    }
+
+    private UploadImg handleProfileImageUpdate(EditProfileImgDto.Request dto, User user) throws IOException {
         ProfileImageUpdateAction action = dto.profileImageAction();
 
-        if ((action == ProfileImageUpdateAction.RESET || action == ProfileImageUpdateAction.UPLOAD)
-                && user.hasCustomImage()) {
+        if (shouldDeleteImg(action, user)) {
             imgStore.deleteImage(user.getImg().getStoreImgDir());
         }
 

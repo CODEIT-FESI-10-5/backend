@@ -49,9 +49,14 @@ public class UserService {
         user.updatePassword(encodedNewPassword);
     }
 
-    public User updateProfile(User user, String nickname, UploadImg UploadImg) {
+    public User updateProfileImg(User user, UploadImg UploadImg) {
+        user.updateProfileImg(UploadImg);
+        return user;
+    }
+
+     public User updateNickname(User user, String nickname) {
         validateDuplicateNickname(user.getId(), nickname);
-        user.updateProfile(nickname, UploadImg);
+        user.updateNickname(nickname);
         return user;
     }
 
