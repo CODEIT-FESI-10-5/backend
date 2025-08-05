@@ -55,15 +55,18 @@ public class User extends BaseDateTime {
                 !this.img.getStoreImgDir().isBlank();
     }
 
-    public void updateProfile(String nickname, UploadImg img) {
-        if (nickname != null) {
-            this.nickname = nickname;
-        }
+    public void updateProfileImg(UploadImg img) {
         this.img = img;
     }
 
+    public void updateNickname(String nickname) {
+        if (nickname != null) {
+            this.nickname = nickname;
+        }
+    }
+
     public void updatePassword(String encodedNewPassword) {
-        if(encodedNewPassword != null) {
+        if (encodedNewPassword != null) {
             this.password = encodedNewPassword;
         }
     }
