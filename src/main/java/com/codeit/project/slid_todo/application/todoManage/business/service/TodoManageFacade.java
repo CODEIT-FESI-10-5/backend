@@ -113,16 +113,8 @@ public class TodoManageFacade {
 
     @Transactional
     public void deleteTodo(Long todoId, Long userId) {
-        Todo todo = todoService.getTodoById(todoId);
-
-        // 투두가 현재 사용자의 것인지 확인
-        if (!todo.getAssignedUser().getUser().getId().equals(userId)) {
-            throw new RuntimeException("자신의 투두만 삭제할 수 있습니다.");
-        }
-
-        // 소프트 삭제
-        todo.delete();
-        todoService.save(todo);
+        // TodoService의 deleteTodo 메서드 사용 (우선순위 조정 포함)
+        todoService.deleteTodo(todoId, userId);
     }
 
     @Transactional

@@ -44,7 +44,7 @@ public class Todo extends BaseDateTime {
 
     private boolean isDeleted = false;
 
-    @OneToOne(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Note note;
 
     @Builder

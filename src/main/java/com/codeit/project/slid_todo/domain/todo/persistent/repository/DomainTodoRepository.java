@@ -58,6 +58,10 @@ public class DomainTodoRepository {
         return jpaTodoRepository.findInProgressTodosByGoalIdAndUserId(goalId, userId);
     }
 
+    public List<Todo> findInProgressTodosByGoalIdAndUserIdOrderByPriority(Long goalId, Long userId) {
+        return jpaTodoRepository.findInProgressTodosByGoalIdAndUserIdOrderByPriority(goalId, userId);
+    }
+
     public List<Todo> findByGoalId(Long goalId) {
         return jpaTodoRepository.findByGoalId(goalId);
     }
@@ -104,5 +108,17 @@ public class DomainTodoRepository {
 
     public List<Todo> findByGoalIdAndUserIdAndPriorityOrderGreaterThan(Long goalId, Long userId, Integer priorityOrder) {
         return jpaTodoRepository.findByGoalIdAndUserIdAndPriorityOrderGreaterThan(goalId, userId, priorityOrder);
+    }
+
+    public Integer findMaxPriorityOrderByGoalIdExcludingTodo(Long goalId, Long excludeTodoId) {
+        return jpaTodoRepository.findMaxPriorityOrderByGoalIdExcludingTodo(goalId, excludeTodoId);
+    }
+
+    public List<Todo> findByGoalIdAndPriorityOrderGreaterThan(Long goalId, Integer priorityOrder) {
+        return jpaTodoRepository.findByGoalIdAndPriorityOrderGreaterThan(goalId, priorityOrder);
+    }
+
+    public void delete(Todo todo) {
+        jpaTodoRepository.delete(todo);
     }
 } 

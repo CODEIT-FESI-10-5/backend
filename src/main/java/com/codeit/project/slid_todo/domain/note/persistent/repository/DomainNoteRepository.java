@@ -38,4 +38,8 @@ public class DomainNoteRepository {
     public List<Note> findByGoalIdAndContentContaining(Long goalId, String noteContent) {
         return jpaNoteRepository.findByGoalIdAndContentContaining(goalId, noteContent);
     }
+
+    public void delete(Note note) {
+        jpaNoteRepository.delete(note);
+    }
 } 

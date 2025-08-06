@@ -10,6 +10,7 @@ import com.codeit.project.slid_todo.domain.todo.persistent.entity.Todo;
 import com.codeit.project.slid_todo.domain.todo.persistent.repository.DomainTodoRepository;
 import com.codeit.project.slid_todo.domain.note.persistent.entity.Note;
 import com.codeit.project.slid_todo.domain.note.persistent.repository.DomainNoteRepository;
+import com.codeit.project.slid_todo.domain.note.business.service.NoteService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class TodoService {
     private final DomainGoalRepository goalRepository;
     private final DomainStudyUserRepository studyUserRepository;
     private final DomainNoteRepository noteRepository;
+    private final NoteService noteService;
 
     private static final int MAX_TODOS_PER_GOAL = 10; // 투두 최대 개수 제한
 
@@ -115,8 +117,14 @@ public class TodoService {
         
         // completed가 null이 아닌 경우에만 처리
         if (completed != null && completed != todo.isCompleted()) {
+            boolean wasCompleted = todo.isCompleted();
             todo.toggleComplete();
-            adjustPriorityWhenUncomplete(todo);
+            
+            // 완료 취소 처리 (completed: false)인 경우에만 우선순위 조정
+            if (wasCompleted && !completed) {
+                adjustPriorityWhenUncomplete(todo);
+            }
+            // 완료 처리 (completed: true)인 경우는 우선순위 건드리지 않음
         }
         
         todoRepository.save(todo);
@@ -143,7 +151,7 @@ public class TodoService {
     }
 
     public List<Todo> getInProgressTodosByGoalIdAndUserId(Long goalId, Long userId) {
-        return todoRepository.findInProgressTodosByGoalIdAndUserId(goalId, userId);
+        return todoRepository.findInProgressTodosByGoalIdAndUserIdOrderByPriority(goalId, userId);
     }
 
     public List<Todo> getTodosByGoalId(Long goalId) {
@@ -209,36 +217,74 @@ public class TodoService {
             // newPriorityOrder = 2
             // 4->2 이동시 2번보다 크거나 같고 4번보다 작은 목록 조회
             List<Todo> todosToAdjust = todoRepository.findByGoalIdAndUserIdAndPriorityOrderBetween(goalId, userId, newPriorityOrder, asIsPriorityOrder - 1);
-
-            // 우선순위를 하나씩 증가
-            for (Todo todo : todosToAdjust) {
-                todo.updatePriorityOrder(todo.getPriorityOrder() + 1);
-                todoRepository.save(todo);
+        
+        // 우선순위를 하나씩 증가
+        for (Todo todo : todosToAdjust) {
+            todo.updatePriorityOrder(todo.getPriorityOrder() + 1);
+            todoRepository.save(todo);
             }
         }
     }
 
     private void adjustPriorityWhenUncomplete(Todo todo) {
         Long goalId = todo.getGoal().getId();
-        Long userId = todo.getAssignedUser().getUser().getId();
         
-        // 해당 목표 하위의 미완료 투두 중에서 현재 투두를 제외한 가장 낮은 우선순위 찾기
-        Integer maxPriorityOrder = todoRepository.findMaxPriorityOrderByGoalIdAndUserIdAndNotCompletedExcludingTodo(goalId, userId, todo.getId());
+        // 목표 전체에서 통합된 우선순위 계산 (사용자 구분 없음)
+        Integer maxPriorityOrder = todoRepository.findMaxPriorityOrderByGoalIdExcludingTodo(goalId, todo.getId());
         
-        if (maxPriorityOrder != null) {
-            // 취소할 투두의 우선순위를 미완료 투두 중 가장 낮은 우선순위로 설정
-            Integer newPriorityOrder = maxPriorityOrder + 1;
-            
-            // 취소할 투두보다 높은 우선순위를 가진 투두들의 우선순위를 -1씩 조정
-            List<Todo> todosToAdjust = todoRepository.findByGoalIdAndUserIdAndPriorityOrderGreaterThan(goalId, userId, todo.getPriorityOrder());
-            
-            for (Todo todoToAdjust : todosToAdjust) {
-                todoToAdjust.updatePriorityOrder(todoToAdjust.getPriorityOrder() - 1);
-                todoRepository.save(todoToAdjust);
-            }
-            
-            // 취소할 투두의 우선순위를 미완료 투두 중 가장 낮은 우선순위로 설정
-            todo.updatePriorityOrder(newPriorityOrder);
+        // 취소할 투두가 이미 가장 뒤에 있으면 아무것도 하지 않음
+        if (maxPriorityOrder == null || todo.getPriorityOrder() > maxPriorityOrder) {
+            return;
+        }
+        
+        // 취소할 투두의 우선순위를 목표 전체 미완료 투두 중 가장 낮은 우선순위로 설정
+        Integer newPriorityOrder = maxPriorityOrder;
+        
+        // 원래 우선순위 저장
+        Integer originalPriorityOrder = todo.getPriorityOrder();
+        
+        // 목표 전체에서 취소할 투두보다 높은 우선순위를 가진 투두들의 우선순위를 -1씩 조정
+        List<Todo> todosToAdjust = todoRepository.findByGoalIdAndPriorityOrderGreaterThan(goalId, originalPriorityOrder);
+        
+        for (Todo todoToAdjust : todosToAdjust) {
+            todoToAdjust.updatePriorityOrder(todoToAdjust.getPriorityOrder() - 1);
+            todoRepository.save(todoToAdjust);
+        }
+        
+        // 마지막에 취소할 투두의 우선순위를 목표 전체 미완료 투두 중 가장 낮은 우선순위로 설정
+        todo.updatePriorityOrder(newPriorityOrder);
+        todoRepository.save(todo);
+    }
+
+    public void deleteTodo(Long todoId, Long userId) {
+        Todo todo = todoRepository.getByIdOrThrow(todoId);
+        
+        // 투두가 현재 사용자의 것인지 확인
+        if (!todo.getAssignedUser().getUser().getId().equals(userId)) {
+            throw new RuntimeException("자신의 투두만 삭제할 수 있습니다.");
+        }
+        
+        // 삭제할 투두보다 높은 우선순위를 가진 투두들의 우선순위를 -1씩 조정
+        adjustPriorityWhenDelete(todo);
+        
+        // 투두와 관련된 노트를 먼저 하드 삭제
+        if (todo.getNote() != null) {
+            noteRepository.delete(todo.getNote());
+        }
+        
+        // 투두 하드 삭제
+        todoRepository.delete(todo);
+    }
+
+    private void adjustPriorityWhenDelete(Todo todo) {
+        Long goalId = todo.getGoal().getId();
+        
+        // 삭제할 투두보다 높은 우선순위를 가진 투두들의 우선순위를 -1씩 조정 (목표 전체에서 통합)
+        List<Todo> todosToAdjust = todoRepository.findByGoalIdAndPriorityOrderGreaterThan(goalId, todo.getPriorityOrder());
+        
+        for (Todo todoToAdjust : todosToAdjust) {
+            todoToAdjust.updatePriorityOrder(todoToAdjust.getPriorityOrder() - 1);
+            todoRepository.save(todoToAdjust);
         }
     }
 } 

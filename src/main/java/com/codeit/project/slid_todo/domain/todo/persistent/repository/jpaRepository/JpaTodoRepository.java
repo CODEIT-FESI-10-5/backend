@@ -62,6 +62,13 @@ public interface JpaTodoRepository extends JpaRepository<Todo, Long> {
 
     @Query("SELECT t FROM Todo t " +
             "LEFT JOIN FETCH t.note " +
+            "WHERE t.goal.id = :goalId AND t.assignedUser.user.id = :userId " +
+            "AND t.completed = false AND t.isDeleted = false " +
+            "ORDER BY t.priorityOrder ASC")
+    List<Todo> findInProgressTodosByGoalIdAndUserIdOrderByPriority(@Param("goalId") Long goalId, @Param("userId") Long userId);
+
+    @Query("SELECT t FROM Todo t " +
+            "LEFT JOIN FETCH t.note " +
             "LEFT JOIN FETCH t.assignedUser su " +
             "LEFT JOIN FETCH su.user " +
             "WHERE t.goal.id = :goalId AND t.isDeleted = false")
@@ -92,6 +99,17 @@ public interface JpaTodoRepository extends JpaRepository<Todo, Long> {
 
     @Query("SELECT MAX(t.priorityOrder) FROM Todo t WHERE t.goal.id = :goalId AND t.assignedUser.user.id = :userId AND t.completed = false AND t.id != :excludeTodoId AND t.isDeleted = false")
     Integer findMaxPriorityOrderByGoalIdAndUserIdAndNotCompletedExcludingTodo(@Param("goalId") Long goalId, @Param("userId") Long userId, @Param("excludeTodoId") Long excludeTodoId);
+
+    @Query("SELECT MAX(t.priorityOrder) FROM Todo t WHERE t.goal.id = :goalId AND t.id != :excludeTodoId AND t.isDeleted = false")
+    Integer findMaxPriorityOrderByGoalIdExcludingTodo(@Param("goalId") Long goalId, @Param("excludeTodoId") Long excludeTodoId);
+
+    @Query("SELECT t FROM Todo t " +
+            "LEFT JOIN FETCH t.note " +
+            "LEFT JOIN FETCH t.assignedUser su " +
+            "LEFT JOIN FETCH su.user " +
+            "WHERE t.goal.id = :goalId AND t.priorityOrder > :priorityOrder AND t.isDeleted = false " +
+            "ORDER BY t.priorityOrder ASC")
+    List<Todo> findByGoalIdAndPriorityOrderGreaterThan(@Param("goalId") Long goalId, @Param("priorityOrder") Integer priorityOrder);
 
     @Query("SELECT t FROM Todo t " +
             "LEFT JOIN FETCH t.note " +
