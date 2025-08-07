@@ -3,6 +3,7 @@ package com.codeit.project.slid_todo.application.auth.business;
 import com.codeit.project.slid_todo.application.auth.web.dto.LoginRequestDto;
 import com.codeit.project.slid_todo.application.auth.web.dto.LoginResponseDto;
 import com.codeit.project.slid_todo.application.auth.web.dto.SignupDto;
+import com.codeit.project.slid_todo.common.exception.BaseException;
 import com.codeit.project.slid_todo.common.security.dto.RefreshTokenDto;
 import com.codeit.project.slid_todo.common.security.errorCode.AuthErrorCode;
 import com.codeit.project.slid_todo.common.security.jwt.JwtProperties;
@@ -86,12 +87,14 @@ public class AuthFacade {
         try {
             String preRefresh = cookieUtils.extractRefreshToken(request);
 
+            if (preRefresh == null) {
+                throw new BaseException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND);
+            }
+
             User user = validRefreshTokenSubject(preRefresh);
 
             String newRefresh = generateRefreshToken(user.getEmail());
             String newAccess = getAccessToken(user);
-
-            log.info("newRefresh={}", newRefresh);
 
             updateRefreshToken(newRefresh, preRefresh, user);
 
@@ -103,11 +106,11 @@ public class AuthFacade {
             response.addCookie(cookieUtils.createAccessTokenCookie(newAccess));
             response.addCookie(cookieUtils.createRefreshTokenCookie(newRefresh));
         } catch (ExpiredJwtException ee) {
-            request.setAttribute("errorCode", AuthErrorCode.ACCESS_TOKEN_EXPIRED);
+            throw new BaseException(AuthErrorCode.ACCESS_TOKEN_EXPIRED);
         } catch (SignatureException se) {
-            request.setAttribute("errorCode", AuthErrorCode.INVALID_SIGNATURE_ACCESS_TOKEN);
+            throw new BaseException(AuthErrorCode.INVALID_SIGNATURE_ACCESS_TOKEN);
         } catch (JwtException je) {
-            request.setAttribute("errorCode", AuthErrorCode.UNAUTHENTICATED);
+            throw new BaseException(AuthErrorCode.UNAUTHENTICATED);
         }
     }
 
