@@ -32,7 +32,10 @@ public class CookieUtils {
     public Cookie createDeleteCookie(String name) {
         Cookie cookie = new Cookie(name, null);
         cookie.setHttpOnly(true);
+        cookie.setSecure(true);
         cookie.setPath("/");
+        cookie.setDomain("modudo.shop");
+        cookie.setAttribute("SameSite", "None");
         cookie.setMaxAge(0);
         return cookie;
     }
