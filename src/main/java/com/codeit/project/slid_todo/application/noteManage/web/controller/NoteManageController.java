@@ -5,6 +5,7 @@ import com.codeit.project.slid_todo.application.noteManage.web.dto.NoteListReque
 import com.codeit.project.slid_todo.application.noteManage.web.dto.NoteListResponseDto;
 import com.codeit.project.slid_todo.application.noteManage.web.dto.NoteDetailResponseDto;
 import com.codeit.project.slid_todo.application.noteManage.web.dto.UpdateNoteRequestDto;
+import com.codeit.project.slid_todo.common.annotation.CurrentUser;
 import com.codeit.project.slid_todo.common.dto.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,9 +27,10 @@ public class NoteManageController {
     @GetMapping("/api/notes")
     @Operation(summary = "노트 목록 조회", description = "목표 하위의 모든 노트 목록을 조회합니다. 제목으로 필터링 가능합니다.")
     public ResponseEntity<ResponseDto<NoteListResponseDto>> getNotesByGoal(
-            @ModelAttribute NoteListRequestDto requestDto) {
+            @ModelAttribute NoteListRequestDto requestDto,
+            @CurrentUser Long userId) {
 
-        NoteListResponseDto response = noteManageFacade.getNotesByGoal(requestDto);
+        NoteListResponseDto response = noteManageFacade.getNotesByGoal(requestDto, userId);
 
         ResponseDto<NoteListResponseDto> responseDto = ResponseDto.<NoteListResponseDto>builder()
                 .httpStatusCode(HttpStatus.OK.value())

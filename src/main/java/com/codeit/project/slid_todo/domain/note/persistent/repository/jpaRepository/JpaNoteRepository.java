@@ -20,9 +20,13 @@ public interface JpaNoteRepository extends JpaRepository<Note, Long> {
     long countByTodoIdAndNotDeleted(@Param("todoId") Long todoId);
 
     @Query("SELECT n FROM Note n " +
-           "LEFT JOIN FETCH n.todo t " +
-           "LEFT JOIN FETCH t.goal g " +
-           "WHERE g.id = :goalId AND n.isDeleted = false " +
-           "AND (:noteContent IS NULL OR n.content LIKE %:noteContent%)")
-    List<Note> findByGoalIdAndContentContaining(@Param("goalId") Long goalId, @Param("noteContent") String noteContent);
+            "LEFT JOIN FETCH n.todo t " +
+            "LEFT JOIN FETCH t.goal g " +
+            "LEFT JOIN t.assignedUser su " +
+            "LEFT JOIN su.user u " +
+            "WHERE g.id = :goalId " +
+            "AND u.id = :userId " +
+            "AND n.isDeleted = false " +
+            "AND (:noteContent IS NULL OR n.content LIKE %:noteContent%)")
+    List<Note> findByGoalIdAndContentContaining(@Param("goalId") Long goalId, @Param("noteContent") String noteContent, @Param("userId") Long userId);
 } 

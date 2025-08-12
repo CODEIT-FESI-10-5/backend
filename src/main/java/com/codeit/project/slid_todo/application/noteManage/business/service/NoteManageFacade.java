@@ -27,7 +27,7 @@ public class NoteManageFacade {
     private final NoteService noteService;
     private final DomainNoteRepository noteRepository;
 
-    public NoteListResponseDto getNotesByGoal(NoteListRequestDto requestDto) {
+    public NoteListResponseDto getNotesByGoal(NoteListRequestDto requestDto, Long userId) {
         Long goalId = requestDto.getGoalId();
         String noteContent = requestDto.getNoteContent();
         
@@ -35,7 +35,7 @@ public class NoteManageFacade {
         Goal goal = goalService.getGoalById(goalId);
         
         // N+1 문제 개선: 직접 Note를 조회
-        List<Note> notes = noteRepository.findByGoalIdAndContentContaining(goalId, noteContent);
+        List<Note> notes = noteRepository.findByGoalIdAndContentContaining(goalId, noteContent, userId);
 
         List<NoteListResponseDto.NoteData> noteDataList = notes.stream()
                 .map(note -> NoteListResponseDto.NoteData.builder()
